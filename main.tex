@@ -1,0 +1,319 @@
+\PassOptionsToPackage{table}{xcolor}
+\documentclass[sigconf,screen,anonymous]{acmart}
+
+\setcopyright{none}
+\settopmatter{printacmref=false}
+\renewcommand\footnotetextcopyrightpermission[1]{}
+\pagestyle{plain}
+
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{pifont}
+
+\definecolor{MGBlue}{RGB}{229,239,249}
+\definecolor{MGGreen}{RGB}{235,247,237}
+\definecolor{MGSand}{RGB}{250,244,230}
+\definecolor{MGGray}{RGB}{245,246,247}
+
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+\newcommand{\best}[1]{\textbf{#1}}
+
+\AtBeginDocument{%
+  \providecommand\BibTeX{{Bib\TeX}}}
+
+\begin{document}
+
+\title[MemoryGuard]{MemoryGuard: Calibrated Memory Commitment Against Persistent Poisoning in Tool-Augmented Agents}
+
+\author{Anonymous Authors}
+\affiliation{%
+  \institution{Anonymous Institution}
+  \country{Anonymous}}
+
+\renewcommand{\shortauthors}{Anonymous Authors}
+
+\begin{abstract}
+Persistent memory improves the continuity of tool-augmented agents, but it
+also creates a durable attack surface: a poisoned workflow can be stored once
+and replayed later during planning. In the ASB persistent-memory poisoning
+setting, we study commitment-based memory defense and identify a deterministic
+failure mode in the original commitment rule. Once poison is detected, the
+original state machine revokes the recalled memory immediately, even when
+sanitization removes the unsafe content and leaves recoverable task structure.
+This over-revocation blocks attacks, but it also discards potentially reusable
+benign workflow information. We repair this failure with MemoryGuard, a
+calibrated recommit rule that detects poisoned recall, sanitizes the retrieved
+workflow, and recommits only when the cleaned workflow remains safe and
+task-aligned; otherwise the memory is revoked. On the current best-available
+canonical ASB task10 evidence, all defended methods show zero observed attack
+success on admitted rows, the original commitment rule remains revoke-only,
+and the repaired rule visibly exercises recommit-after-sanitization on both
+Qwen2.5-7B and current best-available Qwen2.5-14B rows. A controlled
+sanitize-only ablation confirms that recommit is a distinct state transition
+rather than a bookkeeping artifact. At the same time, the current canonical
+route does not yet justify a denominator-sensitive utility ranking across
+defenses, and we explicitly avoid a leaderboard claim until queued closure
+reruns land. The present paper therefore contributes a mechanism-grounded
+defense study with a claim-safe benchmark discipline for persistent memory
+poisoning.
+\end{abstract}
+
+\keywords{agent memory security, persistent memory poisoning, tool-augmented agents, long-term memory defense, responsible multimedia, retrieval safety}
+
+\maketitle
+
+\section{Introduction}
+
+Persistent memory changes the failure modes of tool-augmented agents. Once an
+agent stores a prior workflow and later recalls it for a related task, the
+recalled artifact can influence planning, tool choice, and execution
+structure. This creates a durable poisoning channel: an attacker can seed a
+malicious workflow once and wait for it to be replayed into future decisions.
+
+The obvious defense is to reject suspicious memories aggressively. That
+strategy can suppress attacks, but it can also destroy benign workflow
+structure that the agent ought to preserve. In persistent-memory systems, the
+recalled record often mixes task-relevant procedure with attacker-controlled
+instructions. A defense therefore needs to do more than detect poison; it must
+decide whether any safe structure survives after poison is removed.
+
+This paper studies commitment-based defense in the ASB persistent-memory
+poisoning benchmark. We show that the original commitment rule contains a
+deterministic over-revocation failure. Once poisoned recall is detected, the
+original guard revokes the retrieved memory immediately. That decision is too
+coarse: it treats unrecoverable poisoned memory and recoverable poisoned
+memory as the same case.
+
+We repair this failure with MemoryGuard, a calibrated recommit rule. The
+repaired state machine first detects poisoned recall, then sanitizes the
+retrieved workflow, and finally recommits only if the cleaned workflow remains
+safe and task-aligned. If safe structure does not survive sanitization, the
+memory is revoked. This is not a permissive acceptance policy. It is a
+controlled recovery rule that preserves only sanitized, alignment-checked
+memory.
+
+Our current canonical evidence supports four bounded conclusions. First,
+persistent memory poisoning remains a live attack surface on canonical ASB
+task10: the none baseline still shows non-zero observed attack success.
+Second, the original commitment rule is revoke-only on currently admitted
+canonical rows. Third, the repaired rule visibly enters a
+recommit-after-sanitization branch on both 7B and current best-available 14B
+canonical rows. Fourth, the sanitize-only ablation confirms that recommit is a
+distinct state transition rather than an automatic by-product of
+sanitization. At the same time, the current canonical table remains
+denominator-mismatched, so we do not claim cross-method utility superiority or
+submission-ready leaderboard status.
+
+\paragraph{Contributions.}
+This paper makes four bounded contributions.
+\begin{enumerate}[leftmargin=1.25em]
+\item We identify deterministic over-revocation as a concrete failure mode in
+commitment-based persistent-memory defense.
+\item We propose MemoryGuard, a post-sanitization recommit rule that preserves
+only recovered safe workflow structure.
+\item We provide canonical ASB mechanism evidence showing that the repaired
+rule changes the reachable post-sanitization state while preserving zero
+observed attack success on admitted defended rows.
+\item We enforce a claim discipline that separates mechanism evidence from
+denominator-sensitive leaderboard claims, preventing unsupported benchmark
+language during active closure.
+\end{enumerate}
+
+\section{Problem Setting}
+
+We consider a tool-augmented agent with persistent long-term memory. For a new
+task, the agent may retrieve a previously stored workflow-like memory record.
+In the poisoning setting, that record can include attacker-controlled
+instructions, tool references, or procedural hints that redirect the next
+plan. The defense must decide whether to preserve, sanitize, recommit, or
+revoke the recalled memory.
+
+The difficulty lies in partial corruption. A retrieved workflow may be neither
+entirely clean nor entirely useless. If the defense revokes every poisoned
+recall immediately, it may block the attack while discarding useful procedure.
+If it accepts too much, it may replay attacker logic. The design question is
+therefore not only how to detect poison, but how to act after detection.
+
+\section{Method}
+
+\subsection{Original Commitment Rule}
+
+The original \texttt{memory\_commitment\_guard} follows an all-or-nothing
+policy. Once poisoned recall is detected, the memory is revoked. This design
+is simple and safe on admitted rows, but it conflates two different cases:
+unrecoverable poisoned memory and recoverable poisoned memory whose safe
+structure survives sanitization. That conflation is the core bug. Poison
+detection decides the final action too early.
+
+\subsection{MemoryGuard: Commit After Sanitization}
+
+MemoryGuard inserts an explicit recovery step between poison detection and the
+final commitment decision:
+\begin{enumerate}[leftmargin=1.25em]
+\item detect whether the raw recalled memory is poisoned;
+\item sanitize the recalled workflow by removing unsafe content;
+\item re-evaluate the sanitized workflow for trusted-tool safety and task
+alignment;
+\item recommit only if the cleaned workflow remains safe and aligned;
+otherwise revoke.
+\end{enumerate}
+
+This produces three semantic outcomes: \texttt{committed},
+\texttt{committed\_after\_sanitization}, and \texttt{revoked}. The key design
+change is that poison detection becomes an intermediate signal, not the final
+verdict.
+
+\subsection{Why the Repair Should Work}
+
+The repaired rule should help whenever poisoned recall contains mixed content:
+unsafe instructions plus still-usable procedure. Sanitization removes the
+unsafe portion, and the recommit gate preserves only the part that remains
+aligned. In principle, this can recover benign workflow structure without
+reopening the attack path.
+
+The evidence threshold is important. We do not assume that recommit
+automatically yields a large utility gain. That is a separate empirical
+question. The current draft claims only that the repaired rule changes the
+reachable state machine and visibly exercises a recommit branch on canonical
+evidence.
+
+\subsection{Hybrid Candidate Under Evaluation}
+
+The active experiment queue also includes a stronger hybrid defense,
+\texttt{memory\_commitment\_counterfactual\_guard}, referred to in the queue as
+\texttt{commit\_cfguard}. This hybrid combines the repaired recommit logic with
+a counterfactual veto. It is already implemented in the canonical code path,
+but it is not part of the paper's admitted claim set yet. The draft will only
+promote it into the main story if the queued canonical task10 runs demonstrate
+aligned benchmark superiority.
+
+\section{Experimental Protocol}
+
+\subsection{Benchmark and Models}
+
+The headline benchmark anchor is canonical ASB poisoned-DB task10. This route
+is the only evidence allowed to carry the main claim. Local-route evidence and
+non-canonical task slices are support-only. We evaluate two headline scales:
+Qwen2.5-7B and Qwen2.5-14B.
+
+\subsection{Methods Compared}
+
+Current admitted comparisons include none, commit\_old, commit\_repair,
+commit\_sanitize\_only, protocol\_guard, and counterfactual\_guard. The queued
+extension under evaluation is commit\_cfguard.
+
+\subsection{Metrics}
+
+Paper-facing outcome metrics are Attack Successful, Original Task Successful,
+and row coverage/run hygiene. Mechanism-facing metrics are Memory Poison
+Detected, Memory Decision, and recommit-after-sanitization counts.
+
+\section{Results}
+
+\input{tables/task10_main_results}
+
+\paragraph{Poisoning remains real on the canonical route.}
+The none baseline still shows non-zero observed attack success on canonical
+task10: 624/6120 on Qwen2.5-7B and 280/3366 on Qwen2.5-14B. Persistent memory
+poisoning is not hypothetical on the admitted route.
+
+\paragraph{All admitted defended rows preserve zero observed attack success.}
+On the current best-available canonical rows, every admitted defended method
+shows zero observed attack success. The repaired state machine therefore does
+not recover utility by reopening the attack.
+
+\paragraph{The original commitment rule is revoke-only.}
+The original commitment rule remains revoke-only on currently admitted
+canonical evidence: 6120/6120 revoked on 7B and 3926/3926 revoked on 14B.
+This is the clearest mechanism symptom of over-revocation.
+
+\paragraph{MemoryGuard visibly exercises recommit after sanitization.}
+The repaired rule shows non-zero recommit-after-sanitization on both scales:
+360/6120 on 7B and 197/3943 on 14B. This is the main mechanism result.
+
+\paragraph{Sanitize-only proves recommit is a distinct control decision.}
+The sanitize-only ablation keeps sanitization but removes recommit. On the
+current best-available canonical rows it shows zero recommit events on both
+scales, eliminating the false interpretation that recommit is only a logging
+artifact.
+
+\paragraph{Current utility evidence is still insufficient for ranking claims.}
+The current best-available defended ordering does not support a
+commit\_repair leaderboard claim. On 7B, protocol\_guard and
+counterfactual\_guard are stronger, while commit\_sanitize\_only and
+commit\_old remain slightly above commit\_repair. On 14B, the ordering is
+counterfactual\_guard, protocol\_guard, commit\_sanitize\_only, commit\_old,
+then commit\_repair. The mechanism is real, but benchmark leadership is not
+yet supported.
+
+\paragraph{One failure case that matters.}
+The sanitize-only ablation weakens the strongest early story we hoped to tell.
+On aligned canonical 7B matched-row comparisons, commit\_repair does not show
+a decisive utility advantage over sanitize-only. A representative closed-seed
+comparison on s2 shows commit\_repair better on 39 aligned rows,
+sanitize-only better on 40, and 1961 rows unchanged. Recommit after
+sanitization is therefore a real mechanism change whose utility effect is
+currently modest and setting-dependent rather than decisively positive.
+
+\section{Discussion and Limitations}
+
+The paper's central message is about control logic, not yet about leaderboard
+domination. The original guard makes the final decision too early.
+MemoryGuard delays that decision until after sanitization and alignment
+checking. The resulting mechanism change is visible in the admitted canonical
+data and is not explained away by bookkeeping or ablation artifacts.
+
+At the same time, the benchmark story is more demanding. A recommit branch can
+be real without immediately producing the highest defended original-task
+success. That gap matters because reviewers often conflate mechanism novelty
+with benchmark strength. This draft deliberately separates the two: mechanism
+evidence is admitted now, while denominator-sensitive ranking remains gated
+behind queued closure work and the pending hybrid comparison.
+
+This draft has four explicit limitations. First, the canonical task10 main
+table is still denominator-mismatched, so no cross-method leaderboard language
+is currently safe. Second, the repaired recommit path does not yet have a
+strong aggregate utility advantage over the best defended baselines on the
+canonical route. Third, the defended-run Memory Found field is not a valid raw
+recall metric and cannot be used as retrieval evidence. Fourth, the stronger
+hybrid candidate commit\_cfguard is still under evaluation, so this draft
+cannot use it to upgrade the headline contribution.
+
+\section{Related Work}
+
+This work touches three nearby areas. First, prompt-injection and agent
+security research has established that externally supplied context can redirect
+agent behavior. Persistent memory makes this risk more durable because the
+attack does not need to be re-injected each time; it can be recalled from
+prior storage. Second, retrieval poisoning and memory corruption work
+highlights the tension between defensive filtering and utility preservation.
+Our setting sharpens that tension because the stored object is not only factual
+evidence, but a workflow-like procedure with tool structure. Third, calibrated
+safe mechanisms try to avoid the false choice between permissive acceptance and
+blanket rejection. MemoryGuard belongs to this line: it is a calibrated
+post-sanitization recommit rule rather than a naive accept-all or revoke-all
+policy.
+
+\section{Conclusion}
+
+We study commitment-based defense for persistent memory poisoning in
+tool-augmented agents and identify a deterministic over-revocation failure in
+the original state machine. MemoryGuard repairs that failure by separating
+poison detection from the final commitment decision and recommitting only
+after sanitization and alignment checks. Current canonical ASB evidence shows
+that defended methods preserve zero observed attack success on admitted rows,
+the original commitment rule remains revoke-only, and the repaired rule
+visibly exercises recommit-after-sanitization on both 7B and current
+best-available 14B rows. The current route does not yet support a
+denominator-sensitive utility ranking or a leaderboard claim, and this draft
+explicitly refuses to make one. The correct next step is to close the
+canonical benchmark table and test the queued hybrid under the same claim
+discipline.
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{refs}
+
+\end{document}

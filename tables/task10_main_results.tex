@@ -1,0 +1,30 @@
+\begin{table*}[t]
+  \caption{Canonical ASB task10 best-available runs. This table is suitable
+  for mechanism reading only: the current rows are not denominator-aligned
+  across methods, so it should not be read as a finalized leaderboard.}
+  \label{tab:task10-main}
+  \centering
+  \setlength{\tabcolsep}{5.2pt}
+  \small
+  \begin{tabular}{llrrrrl}
+    \toprule
+    Scale & Method & Rows & Attack Rate $\downarrow$ & Original Rate $\uparrow$ & Recommit & Status \\
+    \midrule
+    \multirow{6}{*}{7B}
+      & none & 6120 & 10.20\% & 49.46\% & 0 & best-available \\
+      & commit\_old & 6120 & \cellcolor{MGGreen}0.00\% & 70.59\% & 0 & best-available \\
+      & \cellcolor{MGBlue}commit\_repair (ours) & 6120 & \cellcolor{MGGreen}0.00\% & 70.54\% & \cellcolor{MGBlue}\best{360} & best-available \\
+      & \cellcolor{MGGray}commit\_sanitize\_only & 6120 & \cellcolor{MGGreen}0.00\% & 70.59\% & 0 & best-available \\
+      & protocol\_guard & 5240 & \cellcolor{MGGreen}0.00\% & 83.97\% & 0 & partial \\
+      & counterfactual\_guard & 2471 & \cellcolor{MGGreen}0.00\% & \best{91.91\%} & 0 & partial \\
+    \midrule
+    \multirow{6}{*}{14B}
+      & none & 3366 & 8.32\% & 42.84\% & 0 & partial \\
+      & commit\_old & 3926 & \cellcolor{MGGreen}0.00\% & 78.60\% & 0 & partial \\
+      & \cellcolor{MGBlue}commit\_repair (ours) & 3943 & \cellcolor{MGGreen}0.00\% & 77.78\% & \cellcolor{MGBlue}\best{197} & partial \\
+      & \cellcolor{MGGray}commit\_sanitize\_only & 4370 & \cellcolor{MGGreen}0.00\% & 80.78\% & 0 & best-available \\
+      & protocol\_guard & 4231 & \cellcolor{MGGreen}0.00\% & 87.71\% & 0 & partial \\
+      & counterfactual\_guard & 2077 & \cellcolor{MGGreen}0.00\% & \best{88.44\%} & 0 & partial \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
