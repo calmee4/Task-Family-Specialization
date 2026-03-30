@@ -1,0 +1,26 @@
+\begin{table}[t]
+  \caption{Completed support-only small-sample breadth slice on defended
+  `seed0' runs. Each row uses the same deterministic 200-case subset
+  (5 agents $\times$ 1 task $\times$ 40 attacker tools). These rows are
+  included only as scope-check evidence and are not used for headline
+  benchmark claims.}
+  \label{tab:support-smallsample}
+  \centering
+  \setlength{\tabcolsep}{3.2pt}
+  \scriptsize
+  \begin{tabular}{llrrr}
+    \toprule
+    Model & Method & Attack $\downarrow$ & Original $\uparrow$ & Recommit \\
+    \midrule
+    \multirow{3}{*}{Mistral-7B}
+      & commit\_old & \cellcolor{MGGreen}0.00\% & 40.00\% & 0 \\
+      & \cellcolor{MGBlue}commit\_repair & \cellcolor{MGGreen}0.00\% & 40.00\% & \cellcolor{MGBlue}\best{40} \\
+      & \cellcolor{MGGray}commit\_sanitize\_only & \cellcolor{MGGreen}0.00\% & 40.00\% & 0 \\
+    \midrule
+    \multirow{3}{*}{Qwen2.5-14B}
+      & commit\_old & \cellcolor{MGGreen}0.00\% & 60.00\% & 0 \\
+      & \cellcolor{MGBlue}commit\_repair & \cellcolor{MGGreen}0.00\% & 60.00\% & \cellcolor{MGBlue}\best{40} \\
+      & \cellcolor{MGGray}commit\_sanitize\_only & \cellcolor{MGGreen}0.00\% & 60.00\% & 0 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
