@@ -60,6 +60,27 @@ image and video stressors stay dark even after the provider expansion. This is
 exactly why we recommend reporting family slices rather than only one total or
 one anecdotal frontier run.
 
+\subsection{Targeted Screens Need Full-Benchmark Backstops}
+
+The supplementary \texttt{gpt-5-chat} full-$54$ run adds a second lesson. A
+targeted screen is good at finding activation points, but it can be optimistic
+about how stable those activations are once the full benchmark distribution is
+restored. On the targeted $14$-task screen, \texttt{gpt-5-chat} looks broadly
+active across seven families. On the full benchmark, the same model still
+performs strongly by local standards, but the mass remains concentrated in
+office, web, and security, with only one successful image task, no successful
+speech tasks, and no successful video task. \texttt{NeuroKit} is the clearest
+internal warning sign: it appears as a success-bearing family in the screen but
+falls back into the graded-but-unsuccessful regime on the full family slice.
+
+This matters for future method papers. If authors use a short targeted slice to
+motivate a broad capability claim, they may accidentally report family
+activation as if it were family robustness. Our recommendation is therefore
+two-stage. Targeted screens are useful for triage, sanity checks, and expanding
+model coverage quickly. But any family-level positive result that becomes part
+of the paper's main narrative should be backstopped by at least one
+full-benchmark or full-family check under the same official metric contract.
+
 \subsection{Why This Matters For Future Agent Papers}
 
 Many future agent papers will not present a new benchmark. They will present a

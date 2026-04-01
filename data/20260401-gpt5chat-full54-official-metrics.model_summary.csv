@@ -1,0 +1,2 @@
+model,total_tasks,official_process_true,official_result_true,process_true_result_false_count,families_with_official_result
+gpt-5-chat-2025-08-07,54,21,16,5,Eparse;Faker;PDFPlumber;PyPDF2;Scrapy;SuperResolution;Trafilatura

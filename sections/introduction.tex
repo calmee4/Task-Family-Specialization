@@ -40,7 +40,9 @@ does not reduce to a purely within-open-model comparison. For the shared-task
 slice, we keep the latest local run per model-task pair. All plots and tables
 aggregate only the benchmark's official \processmetric and \resultmetric
 outputs. Derived rates and heatmaps are marked as paper-side summaries rather
-than as new benchmark metrics.
+than as new benchmark metrics. Finally, we add one full-$54$
+\texttt{gpt-5-chat} provider sweep to test whether the targeted screen remains
+representative once the full benchmark distribution is restored.
 
 Three findings motivate the paper. First, official success is narrow and
 domain-skewed. In the open-8 cohort, all observed \resultmetric mass lies in
@@ -50,7 +52,10 @@ Qwen models each reach $5/54$ official \resultmetric success, but they succeed
 on different tasks and families. The targeted provider screen adds a second
 measurement point: broader frontier coverage changes which families activate,
 but provider models are themselves highly non-uniform on the same official
-tasks. Third, \processmetric$=$True,
+tasks. The full-$54$ \texttt{gpt-5-chat} supplement sharpens that point: even a
+much stronger provider run remains concentrated in office, web, and security,
+while speech and almost all image/video families stay dark. Third,
+\processmetric$=$True,
 \resultmetric$=$False rows are not random residue. They cluster in structured
 extraction families and mix threshold misses, parser failures, and
 evaluation-side errors after grading begins.

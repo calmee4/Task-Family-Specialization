@@ -24,6 +24,13 @@ python3 workspace/_codex/experiments/20260401_gittaskbench_official_metrics_surv
 - shared-task broader cohort:
   - `workspace/_codex/experiments/agent_law_gittaskbench_runs/20260331-gpt52-trafilatura-*/run_manifest.json`
   - `workspace/_codex/experiments/agent_law_gittaskbench_runs/20260331-gemini25-trafilatura-v*/run_manifest.json`
+- targeted provider screen:
+  - `workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-provider14-gpt5chat-openrouter/run_manifest.json`
+  - `workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-provider14-gpt52-openrouter/run_manifest.json`
+  - `workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-provider14-gemini25pro-openrouter/run_manifest.json`
+- full-54 provider supplement:
+  - `workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-gpt5chat-full54-modelhub/run_manifest.json`
+  - `workspace/_codex/experiments/agent_law_gittaskbench_launches/20260401-gpt5chat-full54-modelhub/gpt5chat.log`
 
 ## Paper-Local Data Copies
 
@@ -39,6 +46,9 @@ python3 workspace/_codex/experiments/20260401_gittaskbench_official_metrics_surv
 - `data/20260401-gittaskbench-provider14-official-metrics.rows.csv`
 - `data/20260401-gittaskbench-provider14-official-metrics.model_summary.csv`
 - `data/20260401-gittaskbench-provider14-official-metrics.task_summary.csv`
+- `data/20260401-gpt5chat-full54-official-metrics.rows.csv`
+- `data/20260401-gpt5chat-full54-official-metrics.model_summary.csv`
+- `data/20260401-gpt5chat-full54-official-metrics.task_summary.csv`
 
 ## Table And Figure Build
 
@@ -57,6 +67,7 @@ Generated assets:
   - `tables/domain_summary.tex`
   - `tables/shared_trafilatura.tex`
   - `tables/provider_screen.tex`
+  - `tables/provider_full54_domain.tex`
 
 ## Scope Notes
 
@@ -70,3 +81,6 @@ Generated assets:
   - `gpt-5.2-2025-12-11`
   - `gemini-2.5-pro-preview-06-05`
 - Those rows are reported separately from the full open-8 cohort.
+- The full-54 provider supplement currently included in the paper is:
+  - `gpt-5-chat-2025-08-07`
+- That run is also reported separately from both the full open-8 cohort and the targeted 14-task provider screen.

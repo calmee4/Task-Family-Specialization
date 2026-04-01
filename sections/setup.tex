@@ -75,6 +75,12 @@ official metric contract. We report the screen separately rather than merging
 it into the open-8 totals because it is a targeted slice rather than a
 full-benchmark cohort.
 
+To test whether that targeted slice extrapolates, we also run
+\texttt{gpt-5-chat} over the full $54$-task benchmark under the same local
+agent setup. This yields one provider-side full-benchmark comparison point with
+$54$ additional model-task traces. We likewise report this run separately from
+the open-8 cohort and from the $14$-task provider screen.
+
 \subsection{Aggregation Protocol}
 
 Our paper-side aggregation is intentionally simple. Each model-task trace is

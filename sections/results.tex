@@ -164,6 +164,43 @@ models are not simply converting every non-success into clean official success;
 they are redistributing failures across the benchmark's existing official
 states.
 
+\subsection{A Full-Benchmark Provider Run Shows The Screen Is Not Enough}
+
+The $14$-task provider screen is useful for broadening model coverage, but it is
+still a targeted slice. To test how far that slice extrapolates, we run
+\texttt{gpt-5-chat} on all $54$ official tasks. The full sweep reaches
+\processmetric$=21/54$ and \resultmetric$=16/54$. Table~\ref{tab:provider-full54-domain}
+shows that these successes are again strongly concentrated. Office contributes
+$8/9$ official \resultmetric success, web contributes $4/6$, and security
+contributes $3/9$. By contrast, speech remains at $0/8$, physiological signals
+stay at $0/3$ official \resultmetric despite two \processmetric-positive rows,
+image contributes only $1/18$, and video stays at $0/1$.
+
+\input{tables/provider_full54_domain}
+
+The family breakdown explains why the full sweep is more informative than the
+screen alone. Several screen-positive families remain robust when the full
+family is restored: \texttt{PDFPlumber}, \texttt{PyPDF2}, \texttt{Scrapy}, and
+\texttt{Faker} are all perfect official-success families for
+\texttt{gpt-5-chat} on this run, and \texttt{Trafilatura} retains one official
+success on \texttt{Trafilatura\_03}. But other screen positives do not
+generalize uniformly. \texttt{NeuroKit\_01} was an official success in the
+targeted provider screen, yet the full-benchmark run yields
+\processmetric$=$True, \resultmetric$=$False on \texttt{NeuroKit\_01} and
+\texttt{NeuroKit\_02}, followed by a complete failure on
+\texttt{NeuroKit\_03}. The image side remains even narrower: the only official
+\resultmetric-positive image task is \texttt{SuperResolution\_03}; the other
+$17$ image rows and the lone video row remain unsuccessful.
+
+This is the clearest reason not to treat a targeted provider slice as a hidden
+replacement leaderboard. The screen correctly shows that some open-8 zeros are
+not benchmark-wide impossibilities: provider models can light up
+\texttt{Scrapy}, \texttt{NeuroKit}, and broader office families. But the
+full-$54$ provider run shows that family activation and family robustness are
+not the same claim. A short screen can reveal that a family is reachable at
+all, while still overstating how consistently that reachability extends across
+the benchmark's full task distribution.
+
 \subsection{The \processmetric$=$True, \resultmetric$=$False Regime Clusters}
 
 The open-8 cohort contains $11$ rows with official \processmetric$=$True and
