@@ -29,7 +29,7 @@
 
 \begin{document}
 
-\title[MemoryGuard]{MemoryGuard: Calibrated Memory Commitment Against Persistent Poisoning in Tool-Augmented Agents}
+\title[Commit After Sanitization]{Commit After Sanitization: Calibrated Long-Term Memory Defense against Persistent Agent Poisoning}
 
 \author{Anonymous Authors}
 \affiliation{%
@@ -47,24 +47,26 @@ failure mode in the original commitment rule. Once poison is detected, the
 original state machine revokes the recalled memory immediately, even when
 sanitization removes the unsafe content and leaves recoverable task structure.
 This over-revocation blocks attacks, but it also discards potentially reusable
-benign workflow information. We repair this failure with MemoryGuard, a
-calibrated recommit rule that detects poisoned recall, sanitizes the retrieved
-workflow, and recommits only when the cleaned workflow remains safe and
-task-aligned; otherwise the memory is revoked. On the current best-available
-canonical ASB task10 evidence, all defended methods show zero observed attack
-success on admitted rows, the original commitment rule remains revoke-only,
-and the repaired rule visibly exercises recommit-after-sanitization on both
-Qwen2.5-7B and current best-available Qwen2.5-14B rows. A controlled
-sanitize-only ablation confirms that recommit is a distinct state transition
-rather than a bookkeeping artifact. At the same time, the current canonical
-route does not yet justify a denominator-sensitive utility ranking across
-defenses, and we explicitly avoid a leaderboard claim in this version.
-On a completed support-only 200-case breadth slice for Qwen2.5-14B and
-Mistral-7B, the repaired rule again reaches recommit without observed attack
-leakage, but it remains utility-tied with revoke-only and sanitize-only
-variants. The present paper therefore contributes a
-mechanism-grounded defense study with a claim-safe benchmark discipline for
-persistent memory poisoning.
+benign workflow information. We repair this failure with Sanitized Commitment
+Recovery (SCR), a calibrated commit-after-sanitization rule that detects
+poisoned recall, sanitizes the retrieved workflow, and recommits only when the
+cleaned workflow remains safe and task-aligned; otherwise the memory is
+revoked. We also study a stronger hybrid variant, \texttt{commit\_cfguard},
+which adds a counterfactual veto on top of the repaired recommit logic. On a
+fully closed canonical ASB task10 evaluation over Qwen2.5-7B and Qwen2.5-14B,
+all defended methods preserve zero observed attack success. The repaired
+recommit branch is real and measurable: it activates on 360/6120 rows on both
+scales. But its utility is family-dependent: \texttt{commit\_repair} improves
+over \texttt{commit\_sanitize\_only} on Qwen2.5-7B (79.71\% vs.\ 70.59\%) and
+loses on Qwen2.5-14B (84.31\% vs.\ 86.27\%). The hybrid
+\texttt{commit\_cfguard} is the safer commitment-family variant on the
+canonical Qwen anchor, reaching 80.39\% on 7B and tying the 86.27\%
+commitment-family ceiling on 14B while keeping recommit active. A support-only
+Mistral-7B recoverable slice shows the same tradeoff more sharply:
+recommit-capable variants preserve security but drop from 90.0\% to 80.0\%
+original-task success. These results shift the design question from whether
+agents should recommit after sanitization to when recommit should be enabled
+and how strongly the reuse channel should be calibrated.
 \end{abstract}
 
 \ccsdesc[500]{Security and privacy~Software and application security}
@@ -97,39 +99,41 @@ original guard revokes the retrieved memory immediately. That decision is too
 coarse: it treats unrecoverable poisoned memory and recoverable poisoned
 memory as the same case.
 
-We repair this failure with MemoryGuard, a calibrated recommit rule. The
-repaired state machine first detects poisoned recall, then sanitizes the
-retrieved workflow, and finally recommits only if the cleaned workflow remains
-safe and task-aligned. If safe structure does not survive sanitization, the
-memory is revoked. This is not a permissive acceptance policy. It is a
-controlled recovery rule that preserves only sanitized, alignment-checked
-memory.
+We repair this failure with Sanitized Commitment Recovery (SCR), a calibrated
+commit-after-sanitization rule. The repaired state machine first detects
+poisoned recall, then sanitizes the retrieved workflow, and finally recommits
+only if the cleaned workflow remains safe and task-aligned. If safe structure
+does not survive sanitization, the memory is revoked. This is not a permissive
+acceptance policy. It is a controlled recovery rule that preserves only
+sanitized, alignment-checked memory.
 
 Our current canonical evidence supports four bounded conclusions. First,
 persistent memory poisoning remains a live attack surface on canonical ASB
-task10: the none baseline still shows non-zero observed attack success.
-Second, the original commitment rule is revoke-only on currently admitted
-canonical rows. Third, the repaired rule visibly enters a
-recommit-after-sanitization branch on both 7B and current best-available 14B
-canonical rows. Fourth, the sanitize-only ablation confirms that recommit is a
-distinct state transition rather than an automatic by-product of
-sanitization. At the same time, the current canonical table remains
-denominator-mismatched, so we do not claim cross-method utility superiority or
-submission-ready leaderboard status.
+task10: the none baseline still shows non-zero observed attack success on both
+Qwen scales. Second, the old commitment rule is revoke-only, while the
+repaired rule and its hybrid extension visibly enter a
+recommit-after-sanitization branch. Third, the utility effect of recommit is
+stable but family-dependent: \texttt{commit\_repair} improves over
+\texttt{commit\_sanitize\_only} on Qwen2.5-7B and loses on Qwen2.5-14B across
+all three canonical seeds. Fourth, \texttt{commit\_cfguard} is the safer
+commitment-family variant on the canonical Qwen anchor, but the completed
+Mistral recoverable slice shows that recommit cannot yet be treated as a
+universal gain outside that anchor.
 
 \paragraph{Contributions.}
 This paper makes four bounded contributions.
 \begin{enumerate}[leftmargin=1.25em]
 \item We identify deterministic over-revocation as a concrete failure mode in
 commitment-based persistent-memory defense.
-\item We propose MemoryGuard, a post-sanitization recommit rule that preserves
-only recovered safe workflow structure.
-\item We provide canonical ASB mechanism evidence showing that the repaired
-rule changes the reachable post-sanitization state while preserving zero
-observed attack success on admitted defended rows.
-\item We enforce a claim discipline that separates mechanism evidence from
-denominator-sensitive leaderboard claims, preventing unsupported benchmark
-language during active closure.
+\item We propose a calibrated commitment-family defense: SCR recommits only
+sanitized, task-aligned workflow structure, and
+\texttt{commit\_cfguard} adds a stricter counterfactual veto.
+\item We provide a fully closed canonical ASB task10 evaluation on
+Qwen2.5-7B and Qwen2.5-14B showing that all defended methods block observed
+attacks while the recommit branch remains reachable.
+\item We show that recommit is not universally beneficial: its utility flips
+sign across Qwen scales and degrades on a completed Mistral recoverable slice,
+motivating calibrated reuse rather than blanket recommit.
 \end{enumerate}
 
 \section{Problem Setting}
@@ -170,19 +174,13 @@ accept vs.\ reject counts.
 
 \begin{figure*}[t]
   \centering
-  \fbox{\parbox{0.96\textwidth}{
-    \textbf{Figure placeholder for ACM MM main paper.} The final figure should
-    show the full MemoryGuard control path: raw recall $\rightarrow$ poison
-    detection $\rightarrow$ sanitization $\rightarrow$ trusted-tool and
-    task-alignment checks $\rightarrow$ recommit or revoke. It should also
-    visually contrast the old revoke-only path with the repaired
-    recommit-after-sanitization branch, and indicate that the present code
-    realizes recommit through a reference-only message built from sanitized
-    workflow structure.
-  }}
-  \caption{MemoryGuard decision pipeline. This collaborator draft keeps a
-  layout-stable placeholder so the final publication figure can be dropped
-  into the ACM MM template without reflowing the story.}
+  \includegraphics[width=0.98\textwidth]{figures/memoryguard_pipeline.png}
+  \caption{Commit-after-sanitization decision pipeline. The old commitment
+  rule treats poison detection as the final verdict and immediately revokes
+  recalled memory. SCR keeps detection as an intermediate signal: it
+  sanitizes the recalled workflow, checks trusted-tool safety and task
+  alignment, and recommits only by emitting a bounded reference-only hint
+  when safe structure survives; otherwise it revokes.}
   \label{fig:memoryguard-pipeline}
 \end{figure*}
 
@@ -197,10 +195,10 @@ unrecoverable poisoned memory and recoverable poisoned memory whose safe
 structure survives sanitization. That conflation is the core bug. Poison
 detection decides the final action too early.
 
-\subsection{MemoryGuard: Commit After Sanitization}
+\subsection{Sanitized Commitment Recovery (SCR)}
 
-MemoryGuard inserts an explicit recovery step between poison detection and the
-final commitment decision:
+SCR inserts an explicit recovery step between poison detection and the final
+commitment decision:
 \begin{enumerate}[leftmargin=1.25em]
 \item detect whether the raw recalled memory is poisoned;
 \item sanitize the recalled workflow by removing unsafe content;
@@ -251,57 +249,54 @@ the current planner, recommit can be observable in mechanism logs while
 producing little or even slightly negative utility effect. The current
 canonical results are consistent with exactly this regime.
 
-\subsection{Hybrid Candidate Under Evaluation}
+\subsection{Hybrid Counterfactual Recommit}
 
-The active experiment queue also includes a stronger hybrid defense,
-\texttt{memory\_commitment\_counterfactual\_guard}, referred to in the queue as
-\texttt{commit\_cfguard}. This hybrid combines the repaired recommit logic with
-a counterfactual veto. It is already implemented in the canonical code path,
-but it is not part of the paper's admitted claim set yet. The draft will only
-promote it into the main story if the queued canonical task10 runs demonstrate
-aligned benchmark superiority.
+We also evaluate
+\texttt{memory\_commitment\_counterfactual\_guard}, abbreviated
+\texttt{commit\_cfguard}. This hybrid keeps the repaired recommit path but
+adds a counterfactual veto before the final commitment decision. The purpose
+of the extra gate is not to make recommit more frequent. It is to make the
+reuse decision more selective when the sanitized memory is only weakly useful
+or still suspicious after cleaning.
 
 \section{Experimental Protocol}
 
 \subsection{Benchmark and Models}
 
 The headline benchmark anchor is canonical ASB poisoned-DB task10. This route
-is the only evidence allowed to carry the main claim. Local-route evidence and
-non-canonical task slices are support-only. We evaluate two headline scales:
-Qwen2.5-7B and Qwen2.5-14B. To avoid stalling the draft on a large rerun
-backlog, we also maintain a deterministic 200-case support-only slice for
-Qwen2.5-14B and Mistral-7B. Those rows are used only for scope checking and
-are never promoted into the paper's headline benchmark claim.
+is the only evidence allowed to carry the main claim. We evaluate two headline
+scales, Qwen2.5-7B and Qwen2.5-14B, and aggregate each method over three
+canonical seeds. Non-canonical task slices and non-Qwen models are reported
+only as support evidence for scope checking and mechanism diagnosis.
 
 \subsection{Benchmark Closure and Claim Admission}
 
-All paper-facing numbers are read from deduplicated best-available canonical
-artifacts. For duplicate reruns with the same model, method, seed, and task,
-we keep the highest-row artifact and break ties by newest run root. This rule
-is good enough for mechanism auditing and progress tracking, but it is not a
-benchmark-closure certificate. Any claim that depends on denominator-aligned
-cross-method comparison remains blocked until queued reruns finish and the
-main table closes cleanly.
+All paper-facing numbers are read from deduplicated canonical artifacts. For
+duplicate reruns with the same model, method, seed, and task, we keep the
+highest-row artifact and break ties by newest run root. The current canonical
+Qwen table is fully closed at 6120 rows for every method on both model scales,
+so within-route ranking is now safe. Our claim boundary is therefore scope,
+not table hygiene: we still avoid generalization beyond canonical task10
+unless a result is explicitly marked support-only.
 
 \subsection{Methods Compared}
 
 Current admitted comparisons include none, commit\_old, commit\_repair,
-commit\_sanitize\_only, protocol\_guard, and counterfactual\_guard. The queued
-extension under evaluation is commit\_cfguard.
+commit\_sanitize\_only, two non-commitment baselines
+(\texttt{protocol\_guard} and \texttt{counterfactual\_guard}), and the hybrid
+\texttt{commit\_cfguard}.
 
-\subsection{Support-Only Small-Sample Breadth Slice}
+\subsection{Support-Only Recoverable Slice}
 
-The current collaborator version uses a reduced scope-check slice rather than
-a large family sweep. Each completed breadth run uses the same deterministic
-subset: 5 agents, 1 task per agent, and 40 attacker tools, yielding 200
-poisoned cases. The completed seed-0 slice covers
-\texttt{Mistral-7B-Instruct-v0.2} and \texttt{Qwen2.5-14B-Instruct}, each
-with three defended variants: \texttt{commit\_old},
-\texttt{commit\_repair}, and \texttt{commit\_sanitize\_only}. Additional
-seed-1 reruns and a reduced \texttt{none} baseline are still in progress and
-are excluded from the paper-side claim set. We use this slice only to test
-whether the canonical mechanism story obviously breaks outside the main
-canonical table, not to make a generalized superiority or ranking claim.
+To stress-test the reuse logic outside Qwen without mixing extra noise into
+the main benchmark, we maintain a deterministic Mistral-7B recoverable slice
+using a system-administration agent and a counseling agent on the recoverable
+task subset prepared for this study. Each seed contains 400
+poisoned cases (2 agents $\times$ 5 tasks $\times$ 40 attacker tools). Seeds
+\texttt{s0} and \texttt{s1} are complete for none, commit\_old,
+commit\_sanitize\_only, commit\_repair, and commit\_cfguard. We use this slice
+only to test whether recommit remains beneficial when recoverable workflow
+structure should, in principle, exist.
 
 \subsection{Metrics}
 
@@ -316,140 +311,139 @@ Detected, Memory Decision, and recommit-after-sanitization counts.
 
 \paragraph{Poisoning remains real on the canonical route.}
 The none baseline still shows non-zero observed attack success on canonical
-task10: 624/6120 on Qwen2.5-7B and 280/3366 on Qwen2.5-14B. Persistent memory
+task10: 624/6120 on Qwen2.5-7B and 636/6120 on Qwen2.5-14B. Persistent memory
 poisoning is not hypothetical on the admitted route.
 
 \paragraph{All admitted defended rows preserve zero observed attack success.}
-On the current best-available canonical rows, every admitted defended method
-shows zero observed attack success. The repaired state machine therefore does
-not recover utility by reopening the attack.
+On the fully closed canonical rows, every defended method shows zero observed
+attack success. The recommit-capable variants therefore do not recover utility
+by reopening the attack path.
 
-\paragraph{The original commitment rule is revoke-only.}
-The original commitment rule remains revoke-only on currently admitted
-canonical evidence: 6120/6120 revoked on 7B and 3926/3926 revoked on 14B.
-This is the clearest mechanism symptom of over-revocation.
+\paragraph{The recommit branch is real, but its aggregate utility flips by
+model scale.}
+On Qwen2.5-7B, SCR reaches 4878/6120 original-task success (79.71\%), beating
+both the revoke-only and sanitize-only commitment baselines by 558 rows. On
+Qwen2.5-14B, the same repair falls to 5160/6120 (84.31\%), 120 rows below the
+revoke-only, sanitize-only, and protocol baselines. Recommit is therefore not
+a monotone gain even on the canonical anchor.
 
-\paragraph{MemoryGuard visibly exercises recommit after sanitization.}
-The repaired rule shows non-zero recommit-after-sanitization on both scales:
-360/6120 on 7B and 197/3943 on 14B. This is the main mechanism result.
+\paragraph{Seed-level pairwise validation shows that this sign flip is
+stable.}
+The canonical seed-level comparison does not look like noise. On
+Qwen2.5-7B, the repaired rule beats sanitize-only on all three seeds. On
+Qwen2.5-14B, it loses on all three seeds. The hybrid counterfactual recommit
+variant is slightly better than the plain repaired rule on every 7B seed and
+ties the 14B commitment-family ceiling. The calibration story is therefore
+stable at the seed level, not an artifact of one lucky rerun.
 
-\paragraph{Recommit is visible but sparse.}
-The repair branch is not the dominant path on the current canonical route.
-Its observed activation rate is 5.88\% on 7B and 4.99\% on 14B. This is large
-enough to prove the old revoke-only state machine is not the only reachable
-post-sanitization behavior, but small enough that aggregate utility cannot be
-expected to move dramatically unless the recovered structure is highly
-informative on those rows. Figure~\ref{fig:state-audit} makes this
-decision-state split explicit: the recommit slice exists on both model scales,
-but it remains a small minority of the current admitted rows.
+\paragraph{The original commitment rule remains revoke-only.}
+Table~\ref{tab:task10-state-audit} makes the mechanism difference explicit.
+The original commitment rule revokes 6120/6120 rows on both scales. The
+repaired rule exposes a 360-row recommit-after-sanitization branch on each
+scale, while the sanitize-only ablation sends that same 360-row slice to
+quarantine instead of reuse.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=\columnwidth]{figures/memoryguard_state_audit.png}
   \caption{Canonical task10 decision-state audit for the commitment-family
-  defenses. The repaired rule is the only path that reaches
-  recommit-after-sanitization, while the old rule remains revoke-only. The
-  current 14B rows are still best-available rather than denominator-aligned,
-  so this figure is mechanism-facing rather than leaderboard-facing.}
+  ablation. The old rule is revoke-only, the repaired rule exposes a
+  360-row recommit slice on both Qwen scales, and sanitize-only routes the
+  same slice into quarantine instead of reuse.}
   \label{fig:state-audit}
 \end{figure}
 
 \paragraph{Sanitize-only proves recommit is a distinct control decision.}
-The sanitize-only ablation keeps sanitization but removes recommit. On the
-current best-available canonical rows it shows zero recommit events on both
-scales, eliminating the false interpretation that recommit is only a logging
-artifact.
+The sanitize-only ablation keeps poison detection and workflow cleaning but
+removes the final recommit step. Its zero recommit count on both scales rules
+out the easy interpretation that recommit is merely a bookkeeping artifact of
+sanitization.
 
-\paragraph{Code-grounded reading of the weak utility effect.}
-The current implementation difference between \texttt{commit\_repair} and
-\texttt{commit\_sanitize\_only} is narrower than the state-machine name may
-initially suggest. In repair mode, a sanitized workflow is converted into a
-reference-only message; in sanitize-only mode, the same cleaned record is
-quarantined. Because neither path forces direct execution of the stored plan,
-the utility gap is driven only by how useful that reference message is to the
-planner. The present results indicate that this hint is sometimes helpful, but
-not yet strong enough to dominate sanitize-only or the stronger defended
-baselines. Figure~\ref{fig:branch-quality} shows the same point from inside
-the repaired branch itself: recommitted rows are not uniformly stronger than
-revoked rows, so the mechanism is real without yet being reliably
-utility-positive.
+\paragraph{Hybrid counterfactual recommit is the safer canonical
+commitment-family variant.}
+\texttt{commit\_cfguard} keeps the same 360-row recommit branch as
+\texttt{commit\_repair}, but improves the 7B original-task rate from 79.71\%
+to 80.39\% and matches the 14B commitment-family ceiling at 86.27\%. On the
+current canonical Qwen anchor, it is therefore the strongest or tied-strongest
+commitment-family method while preserving zero attack success.
+
+\paragraph{Within-branch quality explains why recommit helps on one scale and
+hurts on the other.}
+Figure~\ref{fig:branch-quality} looks inside \texttt{commit\_repair} rather
+than across methods. On Qwen2.5-7B, revoked rows retain 4080/5760 original
+success (70.8\%), while recommitted rows retain 237/360 (65.8\%). On
+Qwen2.5-14B, the pattern reverses: revoked rows retain 4920/5760 (85.4\%),
+while recommitted rows retain 360/360 (100.0\%). The aggregate utility effect
+therefore depends on both branch quality and branch frequency.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=\columnwidth]{figures/memoryguard_recommit_branch_quality.png}
   \caption{Within \texttt{commit\_repair}, original-task success on the
   revoked branch versus the recommit branch. Error bars are 95\% Wilson
-  intervals over rows inside each branch. Recommit is visible on both scales,
-  but its conditional utility is model-dependent and modest.}
+  intervals over rows inside each branch. The conditional quality of the
+  recommit branch flips across Qwen scales, explaining why recommit is
+  aggregate-positive on 7B but not on 14B.}
   \label{fig:branch-quality}
 \end{figure}
 
-\paragraph{Current utility evidence is still insufficient for ranking claims.}
-The current best-available defended ordering does not support a
-commit\_repair leaderboard claim. On 7B, protocol\_guard and
-counterfactual\_guard are stronger, while commit\_sanitize\_only and
-commit\_old remain slightly above commit\_repair. On 14B, the ordering is
-counterfactual\_guard, protocol\_guard, commit\_sanitize\_only, commit\_old,
-then commit\_repair. The mechanism is real, but benchmark leadership is not
-yet supported.
-
-\paragraph{One failure case that matters.}
-The sanitize-only ablation weakens the strongest early story we hoped to tell.
-On aligned canonical 7B matched-row comparisons, commit\_repair does not show
-a decisive utility advantage over sanitize-only. A representative closed-seed
-comparison on s2 shows commit\_repair better on 39 aligned rows,
-sanitize-only better on 40, and 1961 rows unchanged. Recommit after
-sanitization is therefore a real mechanism change whose utility effect is
-currently modest and setting-dependent rather than decisively positive.
+\paragraph{The overall strongest canonical baseline is still outside the
+commitment family.}
+\texttt{counterfactual\_guard} remains the best overall canonical method on
+both Qwen scales, reaching 94.12\% on 7B and 90.20\% on 14B. Our contribution
+is therefore not universal dominance over every defense. It is the repair and
+calibration of the commitment family, together with evidence for when a
+post-sanitization reuse branch helps, hurts, or needs stronger gating.
 
 \input{tables/support_smallsample_breadth}
 
-\paragraph{Completed support-only small-sample breadth is consistent but not
-transfer-positive.}
-Table~\ref{tab:support-smallsample} reports the finished seed-0 breadth
-slice. On both Mistral-7B and Qwen2.5-14B, all three defended commitment
-variants preserve zero observed attack success. Within each model, the
-observed original-task success is tied across \texttt{commit\_old},
-\texttt{commit\_repair}, and \texttt{commit\_sanitize\_only}: 80/200 on
-Mistral-7B and 120/200 on Qwen2.5-14B. The recommit branch is therefore not
-Qwen-only, but the current implementation still fails to convert mechanism
-reachability into a clear utility lift on this reduced slice. Additional
-seed-1 reruns and a partial reduced \texttt{none} row are still in flight and
-are excluded from the admitted paper-side claim set.
+\paragraph{Support-only Mistral recoverable results reinforce the calibration
+story.}
+Table~\ref{tab:support-smallsample} reports the completed Mistral-7B
+recoverable slice. Both completed seeds yield the same rates. The none
+baseline leaks on 19/400 cases and never completes the original task.
+\texttt{commit\_old} and sanitize-only preserve zero attack success and reach
+360/400 original-task success (90.0\%). The recommit-capable variants SCR and
+\texttt{commit\_cfguard} also preserve zero attack success and activate
+recommit on 120/400 cases, but drop to 320/400 original-task success (80.0\%).
+This is the strongest completed
+non-Qwen evidence in the current draft, and it argues against any universal
+``recommit always helps'' story.
 
 \section{Discussion and Limitations}
 
-The paper's central message is about control logic, not yet about leaderboard
-domination. The original guard makes the final decision too early.
-MemoryGuard delays that decision until after sanitization and alignment
-checking. The resulting mechanism change is visible in the admitted canonical
-data and is not explained away by bookkeeping or ablation artifacts.
+The paper's central message is now stronger than a pure mechanism note, but it
+is still deliberately bounded. On the canonical Qwen anchor, the table is
+fully closed and safe for ranking. That closure lets us say something more
+precise than ``recommit exists'': recommit helps on one model scale, hurts on
+another, and benefits from stricter gating through \texttt{commit\_cfguard}.
 
-At the same time, the benchmark story is more demanding. A recommit branch can
-be real without immediately producing the highest defended original-task
-success. That gap matters because reviewers often conflate mechanism novelty
-with benchmark strength. This draft deliberately separates the two: mechanism
-evidence is admitted now, while denominator-sensitive ranking remains gated
-behind queued closure work and the pending hybrid comparison.
+At the same time, the broader generalization story remains support-only. The
+completed Mistral recoverable slice already shows that recommit is not
+universally utility-positive, and the overall strongest canonical defense is
+still the counterfactual baseline rather than our repaired commitment rule.
+These facts are not weaknesses to hide; they define the actual contribution.
+The paper is about calibrated recovery inside the commitment family, not about
+beating every defense on every model.
 
-This draft has four explicit limitations. First, the canonical task10 main
-table is still denominator-mismatched, so no cross-method leaderboard language
-is currently safe. Second, the repaired recommit path does not yet have a
-strong aggregate utility advantage over the best defended baselines on the
-canonical route. Third, the defended-run Memory Found field is not a valid raw
-recall metric and cannot be used as retrieval evidence. Fourth, the stronger
-hybrid candidate commit\_cfguard is still under evaluation, so this draft
-cannot use it to upgrade the headline contribution.
+This draft has four explicit limitations. First, the headline claim is still
+restricted to canonical ASB task10 on Qwen; non-Qwen evidence is currently
+limited to one completed Mistral support slice. Second, the repaired reuse
+channel remains a reference-only hint rather than direct workflow replay, so
+its utility ceiling may be lower than what a stronger executor-side reuse
+mechanism could achieve. Third, the defended-run Memory Found field is not a
+valid raw-recall metric and cannot be used as retrieval evidence. Fourth, the
+current paper does not yet include closed-source or broader model-family
+coverage, so cross-family universality remains open.
 
-\paragraph{What still separates this draft from a strong full-paper package.}
-The remaining gap is not a missing emergency experiment but an evidence-shape
-problem. We still lack denominator-aligned canonical closure for ranking
-language, and the completed breadth slice remains narrow and utility-tied.
-The next version therefore has to choose one of two honest paths: either stay
-explicitly mechanism-first and bounded, or add stronger aligned breadth
-evidence before upgrading the submission ambition. Independent of that
-decision, the paper still needs a publication-quality pipeline figure and a
-clearer explanation of when recommit helps and when it does not.
+\paragraph{What still separates this draft from a stronger package.}
+The main missing piece is broader support evidence, not more canonical Qwen
+closure. Additional DeepSeek and per-agent Mistral diagnostics can sharpen the
+scope paragraph and the mechanism explanation, but they are no longer required
+to justify the main canonical story. The present version already contains a
+closed benchmark table, a state-audit figure, a within-branch quality figure,
+and one completed non-Qwen failure case. What remains is to tighten the
+cross-family evidence, not to inflate the claims.
 
 \section{Related Work}
 
@@ -462,7 +456,7 @@ highlights the tension between defensive filtering and utility preservation.
 Our setting sharpens that tension because the stored object is not only factual
 evidence, but a workflow-like procedure with tool structure. Third, calibrated
 safe mechanisms try to avoid the false choice between permissive acceptance and
-blanket rejection. MemoryGuard belongs to this line: it is a calibrated
+blanket rejection. SCR belongs to this line: it is a calibrated
 post-sanitization recommit rule rather than a naive accept-all or revoke-all
 policy.
 
@@ -470,21 +464,20 @@ policy.
 
 We study commitment-based defense for persistent memory poisoning in
 tool-augmented agents and identify a deterministic over-revocation failure in
-the original state machine. MemoryGuard repairs that failure by separating
-poison detection from the final commitment decision and recommitting only
-after sanitization and alignment checks. Current canonical ASB evidence shows
-that defended methods preserve zero observed attack success on admitted rows,
-the original commitment rule remains revoke-only, and the repaired rule
-visibly exercises recommit-after-sanitization on both 7B and current
-best-available 14B rows. The current route does not yet support a
-denominator-sensitive utility ranking or a leaderboard claim, and this draft
-explicitly refuses to make one. The completed support-only small-sample
-breadth slice on Mistral-7B and Qwen2.5-14B shows the same qualitative
-pattern: recommit becomes reachable without observed attack leakage, but the
-current implementation does not yet produce a clear utility lift over the
-other defended commitment variants. The correct next step is therefore to
-harden a bounded mechanism-first submission version while continuing only
-those additional reruns that can materially clarify the scope of the effect.
+the original state machine. SCR repairs that failure by separating poison
+detection from the final commitment decision and recommitting only after
+sanitization and alignment checks. The fully closed canonical Qwen task10
+table shows that all defended methods preserve zero observed attack success,
+the original commitment rule remains revoke-only, and the recommit branch is
+real but family-dependent: \texttt{commit\_repair} helps on Qwen2.5-7B and
+hurts on Qwen2.5-14B, while the hybrid \texttt{commit\_cfguard} is the safer
+commitment-family compromise on the canonical anchor. The completed
+support-only Mistral recoverable slice pushes the same lesson further:
+recommit-capable variants preserve security but can still reduce task utility.
+Long-term memory defense should therefore be framed as calibrated recovery,
+not blanket revocation and not blanket recommit. The next step is broader
+cross-family validation of that calibration story, not another round of
+overstated benchmark rhetoric.
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{refs}

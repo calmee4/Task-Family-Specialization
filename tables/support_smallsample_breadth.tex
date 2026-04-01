@@ -1,26 +1,24 @@
 \begin{table}[t]
-  \caption{Completed support-only small-sample breadth slice on defended
-  `seed0' runs. Each row uses the same deterministic 200-case subset
-  (5 agents $\times$ 1 task $\times$ 40 attacker tools). These rows are
-  included only as scope-check evidence and are not used for headline
-  benchmark claims.}
+  \caption{Completed support-only Mistral-7B recoverable slice. Each row
+  reports the per-seed outcome over the same deterministic 400-row task5
+  subset (2 agents $\times$ 5 tasks $\times$ 40 attacker tools); seeds
+  \texttt{s0} and \texttt{s1} produce the same rates and are therefore
+  summarized together. These rows are used only to probe cross-family
+  behavior and are not part of the canonical Qwen claim set.}
   \label{tab:support-smallsample}
   \centering
   \setlength{\tabcolsep}{3.2pt}
   \scriptsize
-  \begin{tabular}{llrrr}
+  \begin{tabular}{llrrrr}
     \toprule
-    Model & Method & Attack $\downarrow$ & Original $\uparrow$ & Recommit \\
+    Model & Method & Cases/Seed & Attack $\downarrow$ & Original $\uparrow$ & Recommit/Seed \\
     \midrule
-    \multirow{3}{*}{Mistral-7B}
-      & commit\_old & \cellcolor{MGGreen}0.00\% & 40.00\% & 0 \\
-      & \cellcolor{MGBlue}commit\_repair & \cellcolor{MGGreen}0.00\% & 40.00\% & \cellcolor{MGBlue}\best{40} \\
-      & \cellcolor{MGGray}commit\_sanitize\_only & \cellcolor{MGGreen}0.00\% & 40.00\% & 0 \\
-    \midrule
-    \multirow{3}{*}{Qwen2.5-14B}
-      & commit\_old & \cellcolor{MGGreen}0.00\% & 60.00\% & 0 \\
-      & \cellcolor{MGBlue}commit\_repair & \cellcolor{MGGreen}0.00\% & 60.00\% & \cellcolor{MGBlue}\best{40} \\
-      & \cellcolor{MGGray}commit\_sanitize\_only & \cellcolor{MGGreen}0.00\% & 60.00\% & 0 \\
+    \multirow{5}{*}{Mistral-7B}
+      & none & 400 & 4.75\% & 0.00\% & 0 \\
+      & commit\_old & 400 & \cellcolor{MGGreen}0.00\% & \best{90.00\%} & 0 \\
+      & \cellcolor{MGGray}commit\_sanitize\_only & 400 & \cellcolor{MGGreen}0.00\% & \best{90.00\%} & 0 \\
+      & \cellcolor{MGBlue}commit\_repair & 400 & \cellcolor{MGGreen}0.00\% & 80.00\% & \cellcolor{MGBlue}\best{120} \\
+      & \cellcolor{MGBlue}commit\_cfguard & 400 & \cellcolor{MGGreen}0.00\% & 80.00\% & \cellcolor{MGBlue}\best{120} \\
     \bottomrule
   \end{tabular}
 \end{table}
