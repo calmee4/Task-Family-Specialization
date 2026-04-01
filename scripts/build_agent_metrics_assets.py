@@ -106,7 +106,7 @@ def build_model_summary_table(rows):
     )
     lines = [
         "\\begin{table}[t]",
-        "\\caption{Official GitTaskBench summary on the comparable open-8 local cohort.}",
+        "\\caption{Official GitTaskBench summary on the comparable local cohort.}",
         "\\label{tab:model-summary}",
         "\\centering",
         "\\small",
@@ -118,8 +118,8 @@ def build_model_summary_table(rows):
     for row in rows:
         lines.append(
             f'{escape_tex(pretty_model(row["model"]))} & '
-            f'{row["official_process_true"]}/54 & '
-            f'{row["official_result_true"]}/54 \\\\'
+            f'{row["official_process_true"]} & '
+            f'{row["official_result_true"]} \\\\'
         )
     lines.extend(["\\bottomrule", "\\end{tabular}", "\\end{table}", ""])
     write(TABLES / "model_summary.tex", "\n".join(lines))
@@ -135,19 +135,19 @@ def build_domain_table(row_records):
 
     lines = [
         "\\begin{table}[t]",
-        "\\caption{Domain-level concentration under official GitTaskBench metrics. Rates are paper-side aggregates over official per-task outputs.}",
+        "\\caption{Domain-level concentration under official GitTaskBench metrics. Process and Result are paper-side aggregates over official outputs.}",
         "\\label{tab:domain-summary}",
         "\\centering",
         "\\small",
-        "\\begin{tabular}{lrrr}",
+        "\\begin{tabular}{lrr}",
         "\\toprule",
-        "Domain & Total & Process & Result \\\\",
+        "Domain & Process & Result \\\\",
         "\\midrule",
     ]
     for domain in DOMAIN_ORDER:
         item = stats[domain]
         lines.append(
-            f'{domain} & {item["total"]} & {item["process"]} & {item["result"]} \\\\'
+            f'{domain} & {item["process"]} & {item["result"]} \\\\'
         )
     lines.extend(["\\bottomrule", "\\end{tabular}", "\\end{table}", ""])
     write(TABLES / "domain_summary.tex", "\n".join(lines))
@@ -193,7 +193,7 @@ def build_provider_screen_table(model_rows):
 
     lines = [
         "\\begin{table}[t]",
-        "\\caption{Supplementary provider screen on 14 selected tasks. Counts are official GitTaskBench outcomes and are reported separately from the comparable open-8 cohort.}",
+        "\\caption{Supplementary GitTaskBench provider screen. Official outcomes are reported separately from the comparable local cohort.}",
         "\\label{tab:provider-screen}",
         "\\centering",
         "\\small",
@@ -205,8 +205,8 @@ def build_provider_screen_table(model_rows):
     for row in rows:
         lines.append(
             f'{escape_tex(pretty_model(row["model"]))} & '
-            f'{row["official_process_true"]}/14 & '
-            f'{row["official_result_true"]}/14 & '
+            f'{row["official_process_true"]} & '
+            f'{row["official_result_true"]} & '
             f'{escape_tex(row["families_with_official_result"] or "--")} \\\\'
         )
     lines.extend([
@@ -230,13 +230,13 @@ def build_provider_full54_domain_table(rows):
 
     lines = [
         "\\begin{table}[t]",
-        "\\caption{Supplementary full-54 \\texttt{gpt-5-chat} run summarized by domain. Counts are paper-side aggregates over official per-task GitTaskBench outputs.}",
+        "\\caption{Supplementary full-benchmark \\texttt{gpt-5-chat} GitTaskBench run summarized by domain. Process and Result are paper-side aggregates over official outputs.}",
         "\\label{tab:provider-full54-domain}",
         "\\centering",
         "\\small",
-        "\\begin{tabular}{lrrr}",
+        "\\begin{tabular}{lrr}",
         "\\toprule",
-        "Domain & Total & Process & Result \\\\",
+        "Domain & Process & Result \\\\",
         "\\midrule",
     ]
     for domain in DOMAIN_ORDER:
@@ -244,7 +244,7 @@ def build_provider_full54_domain_table(rows):
         if item["total"] == 0:
             continue
         lines.append(
-            f'{domain} & {item["total"]} & {item["process"]} & {item["result"]} \\\\'
+            f'{domain} & {item["process"]} & {item["result"]} \\\\'
         )
     lines.extend(["\\bottomrule", "\\end{tabular}", "\\end{table}", ""])
     write(TABLES / "provider_full54_domain.tex", "\n".join(lines))
@@ -270,11 +270,11 @@ def plot_model_summary(rows):
     ax.barh(y - h / 2, result, height=h, color="#1d3557", label="Result")
     ax.set_yticks(y)
     ax.set_yticklabels(labels, fontsize=8)
-    ax.set_xlabel("Official successes out of 54 tasks")
+    ax.set_xlabel("Official success count")
     ax.set_xlim(0, 10)
     ax.grid(axis="x", linestyle="--", alpha=0.3)
     ax.legend(frameon=False, loc="lower right")
-    ax.set_title("Comparable open-8 cohort under GitTaskBench official metrics")
+    ax.set_title("Comparable local cohort under GitTaskBench official metrics")
     for idx, value in enumerate(process):
         ax.text(value + 0.12, y[idx] + h / 2, str(value), va="center", fontsize=8)
     for idx, value in enumerate(result):
@@ -313,7 +313,7 @@ def plot_domain_summary(row_records):
         ax.text(
             x[idx] - w / 2,
             process_rates[idx] + 0.008,
-            f'{stats[domain]["process"]}/{total}',
+            f'{process_rates[idx]:.2f}',
             ha="center",
             va="bottom",
             fontsize=7,
@@ -322,7 +322,7 @@ def plot_domain_summary(row_records):
         ax.text(
             x[idx] + w / 2,
             result_rates[idx] + 0.008,
-            f'{stats[domain]["result"]}/{total}',
+            f'{result_rates[idx]:.2f}',
             ha="center",
             va="bottom",
             fontsize=7,

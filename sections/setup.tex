@@ -31,14 +31,9 @@ report parsing or evaluation errors after grading begins.
 \subsection{Cohorts}
 
 The main cohort is a comparable local open-model sweep over the official
-\gittaskbench task set:
-\begin{itemize}[leftmargin=1.25em]
-\item $8$ models,
-\item $54$ tasks,
-\item $432$ model-task traces.
-\end{itemize}
+\gittaskbench task set.
 
-The eight models are:
+The local open-model roster is:
 \begin{itemize}[leftmargin=1.25em]
 \item \texttt{Qwen2.5-7B},
 \item \texttt{Qwen2.5-14B},
@@ -52,34 +47,31 @@ The eight models are:
 
 To reduce Qwen-centric interpretation, we add a second cohort built from the
 latest local runs on shared tasks \texttt{Trafilatura\_01} and
-\texttt{Trafilatura\_02}. This slice expands the roster to $10$ models by adding
+\texttt{Trafilatura\_02}. This slice expands the roster by adding
 \texttt{gpt-5.2} and \texttt{Gemini-2.5-Pro}. The shared-task cohort is
 smaller, but it lets us check whether some official success patterns already
 extend beyond the open-model local sweep. Exact raw model identifiers are kept
 in the released CSV artifacts.
 
-For the comparable open-8 cohort, we use the full set of local
-\texttt{20260401-open8gpu-fullbench-v4} manifests. For the shared
-\texttt{Trafilatura} slice, we retain the latest local run available for each
-model-task pair. This gives broader model coverage, but it is not a synchronized
-same-day frontier rerun.
+For the comparable local cohort, we use the full set of local manifests from
+the main GitTaskBench sweep. For the shared \texttt{Trafilatura} slice, we
+retain the latest local run available for each model-task pair. This gives
+broader model coverage, but it is not a synchronized same-day frontier rerun.
 
 As a supplementary robustness check, we also complete one targeted provider
-screen on the same $14$ tasks for three locally available provider models:
+screen for three locally available provider models:
 \texttt{gpt-5-chat}, \texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro}. The task
 set is intentionally small but structured. It includes all open-8
 success-bearing families, the main open-8
 \processmetric$=$True/\resultmetric$=$False families, and one image plus one
-video stressor. This produces $42$ additional model-task traces under the same
-official metric contract. We report the screen separately rather than merging
-it into the open-8 totals because it is a targeted slice rather than a
+video stressor. We report the screen separately rather than merging
+it into the comparable local totals because it is a targeted slice rather than a
 full-benchmark cohort.
 
 To test whether that targeted slice extrapolates, we also run
-\texttt{gpt-5-chat} over the full $54$-task benchmark under the same local
-agent setup. This yields one provider-side full-benchmark comparison point with
-$54$ additional model-task traces. We likewise report this run separately from
-the open-8 cohort and from the $14$-task provider screen.
+\texttt{gpt-5-chat} over the full benchmark under the same local
+agent setup. We likewise report this run separately from the comparable local
+cohort and from the targeted provider screen.
 
 \subsection{Aggregation Protocol}
 
@@ -93,21 +85,21 @@ security tasks; \texttt{Trafilatura} and \texttt{Scrapy} are web tasks; and so
 on. We do not learn a taxonomy from results.
 
 This matters because the benchmark is structurally imbalanced even before model
-performance enters the picture. In the open-8 cohort, image tasks account for
-$144$ of $432$ traces, office tasks for $72$, security for $72$, speech for
-$64$, web for $48$, physiological signals for $24$, and video for $8$. A global
-pass rate over this mixture is therefore a blend over very different task
-families and very different amounts of evaluation mass.
+performance enters the picture. Image tasks occupy the largest share of
+evaluation mass, while video is only a small residue. A global pass rate over
+this mixture is therefore a blend over very different task families and very
+different amounts of evaluation mass.
 
 The same logic explains why we keep the supplementary provider screen separate.
 That screen is deliberately curated toward the families that matter most for the
-current paper: open-8 success families, open-8 graded-but-unsuccessful
-families, and one image/video stress check. It is therefore useful as a
-robustness probe, but it is not a replacement for the comparable open-8 cohort.
+current paper: the main success-bearing families, the main
+graded-but-unsuccessful families, and one image/video stress check. It is
+therefore useful as a robustness probe, but it is not a replacement for the
+comparable local cohort.
 Mixing the two into one aggregate would create a reporting problem of its own:
 the same paper would conflate a benchmark-wide cohort with a targeted slice.
 That distinction matters even more once the provider screen is multi-model. The
-screen is useful for checking whether some open-8 zeros disappear under a
+screen is useful for checking whether some local zeros disappear under a
 different model class, but it should not be mistaken for a replacement
 leaderboard.
 

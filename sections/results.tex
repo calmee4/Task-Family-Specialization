@@ -3,15 +3,14 @@
 \subsection{Global Totals Are Narrow and Domain-Skewed}
 
 Table~\ref{tab:model-summary} gives the exact official totals for the comparable
-open-8 cohort. The raw totals are already modest: the top three models each
-reach only $5/54$ official \resultmetric success, while three models remain at
-$0/54$ on both official fields. Figure~\ref{fig:overview} adds the broader
-distributional picture. Official success is not spread evenly across the
-benchmark. In the open-8 cohort, office-document families contribute $10/72$
-\resultmetric successes, security contributes $7/72$, web contributes $2/48$,
-and speech contributes $2/64$. Physiological signals show two
-\processmetric-true traces but zero \resultmetric successes. Image and video are
-complete zeros.
+local cohort. The raw totals are already modest: several leading models tie at
+the top, while three models remain at zero on both official fields.
+Figure~\ref{fig:overview} adds the broader distributional picture. Official
+success is not spread evenly across the benchmark. In the comparable local
+cohort, office-document and security families contribute most of the observed
+\resultmetric success, web and speech contribute a smaller residue,
+physiological signals reach grading without \resultmetric success, and image
+and video are complete zeros.
 
 \input{tables/model_summary}
 \input{tables/domain_summary}
@@ -21,15 +20,15 @@ complete zeros.
     \begin{subfigure}[t]{0.58\textwidth}
         \centering
         \includegraphics[width=\textwidth]{figures/figure_model_summary.pdf}
-        \caption{Comparable open-8 official totals.}
+        \caption{Comparable local official totals.}
     \end{subfigure}
     \hfill
     \begin{subfigure}[t]{0.38\textwidth}
         \centering
         \includegraphics[width=\textwidth]{figures/figure_domain_summary.pdf}
-        \caption{Paper-side rates aggregated from official outputs.}
+        \caption{Paper-side summaries aggregated from official outputs.}
     \end{subfigure}
-    \caption{Global official scores hide a strongly skewed success distribution. The benchmark's observed success mass is concentrated in office, security, web, and speech families, while image and video are complete zeros in the open-8 local cohort.}
+    \caption{Global official scores hide a strongly skewed success distribution. The benchmark's observed success mass is concentrated in office, security, web, and speech families, while image and video are complete zeros in the comparable local cohort.}
     \label{fig:overview}
 \end{figure*}
 
@@ -46,17 +45,18 @@ with repeatable task completion, domains with gradeable-but-unsuccessful traces,
 and domains with no observed official traction at all.
 
 This point becomes stronger once we separate benchmark mass from success mass.
-Image tasks constitute the single largest domain block in the open-8 cohort, but
+Image tasks constitute the single largest domain block in the comparable local
+cohort, but
 they contribute nothing to observed official success. Office and security are
 much smaller by trace count than image plus video combined, yet they account for
-nearly all observed \resultmetric success. A single total like ``$5/54$'' cannot
+nearly all observed \resultmetric success. A single total cannot
 tell the reader whether a model is weak everywhere, strong only on structured
 extraction, or simply facing a benchmark where most active success mass lives in
 just a few families.
 
 \subsection{Tied Headline Scores Hide Family Specialization}
 
-The three headline leaders in the open-8 cohort tie at $5/54$ official
+The three headline leaders in the comparable local cohort tie on official
 \resultmetric success, but the tied total is misleading. \texttt{Qwen2.5-14B}
 reaches official success in \texttt{Eparse}, \texttt{PDFPlumber}, and
 \texttt{Faker}. \texttt{Qwen2.5-32B} keeps those families and adds
@@ -71,7 +71,7 @@ for \texttt{Mistral-Small-24B}.
 \begin{figure}[t]
     \centering
     \includegraphics[width=\columnwidth]{figures/figure_task_heatmap.pdf}
-    \caption{Official \resultmetric task heatmap for all tasks with at least one observed success in the open-8 cohort. Several models tie globally, but they do not win on the same task set.}
+    \caption{Official \resultmetric task heatmap for all tasks with at least one observed success in the comparable local cohort. Several models tie globally, but they do not win on the same task set.}
     \label{fig:task-heatmap}
 \end{figure}
 
@@ -80,7 +80,7 @@ hide material specialization even before we look at trajectories, prompts, or
 manual annotations. If the reporting goal is to understand what a repo-grounded
 agent can actually do, the family slice matters.
 
-It also matters for how we read ties. A tie at $5/54$ is easy to over-interpret
+It also matters for how we read ties. A shared top-line total is easy to over-interpret
 as evidence that the three models are functionally interchangeable. The task
 heatmap shows that they are not. One model's official success budget is spent on
 \texttt{Eparse}; another's is spent on \texttt{Trafilatura}; another picks up
@@ -91,9 +91,9 @@ one narrow family.
 
 \subsection{The Local Evidence Already Extends Beyond Qwen}
 
-The open-8 comparable cohort contains only one non-Qwen model with non-zero
+The comparable local cohort contains only one non-Qwen model with non-zero
 official \resultmetric success: \texttt{Mistral-Small-24B}
-achieves $2/54$. Its wins are \texttt{Eparse\_02} and
+Its wins are \texttt{Eparse\_02} and
 \texttt{Trafilatura\_03}. That is enough to prevent the main observation from
 reducing to a purely within-Qwen comparison, although same-task non-Qwen
 coverage remains limited. The shared-task \texttt{Trafilatura} slice extends
@@ -113,8 +113,8 @@ appear in local evidence.
 \subsection{A Supplementary Provider Screen Changes The Active Families}
 
 The shared \texttt{Trafilatura} slice broadens coverage across models but only on
-two tasks. To test whether the family picture changes on a slightly wider slice,
-we complete the same targeted $14$-task screen for three provider models:
+a narrow slice. To test whether the family picture changes on a slightly wider
+slice, we complete the same targeted provider screen for three provider models:
 \texttt{gpt-5-chat}, \texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro}. The task set
 includes office, security, speech, web, physiological-signal, image, and video
 tasks, and it is scored only with official \processmetric/\resultmetric
@@ -122,11 +122,10 @@ outputs.
 
 \input{tables/provider_screen}
 
-The resulting spread is already substantial. \texttt{gpt-5-chat} reaches
-official \processmetric$=11/14$ and \resultmetric$=9/14$ across seven
-families. \texttt{gpt-5.2} reaches \processmetric$=10/14$ and
-\resultmetric$=7/14$ across six families. \texttt{Gemini-2.5-Pro} reaches only
-\processmetric$=1/14$ and \resultmetric$=1/14$, both on
+The resulting spread is already substantial. \texttt{gpt-5-chat} leads the
+screen on both official fields and spans the broadest family footprint.
+\texttt{gpt-5.2} follows with a slightly narrower family footprint.
+\texttt{Gemini-2.5-Pro} reaches official success only on
 \texttt{PDFPlumber\_01}. The provider screen therefore broadens the evidence
 base, but it does not behave like a single homogeneous ``closed-model'' control
 condition.
@@ -142,10 +141,10 @@ structure that a single global pass rate would obscure. If we reported only one
 provider total, we would hide the fact that ``provider strength'' is itself
 family-selective in local evidence.
 
-The provider screen also changes how we should read the open-8 zeros. A zero in
-the open-8 cohort need not mean the family is inherently impossible under the
+The provider screen also changes how we should read the local zeros. A zero in
+the comparable local cohort need not mean the family is inherently impossible under the
 benchmark's official metric. \texttt{NeuroKit} and \texttt{Scrapy} illustrate
-this clearly. In the open-8 cohort they contribute only to the
+this clearly. In the comparable local cohort they contribute only to the
 \processmetric$=$True, \resultmetric$=$False regime or to complete failure. In
 the provider screen they become official \resultmetric-positive families for
 both GPT-family models. By contrast, the image and video stressors,
@@ -166,15 +165,13 @@ states.
 
 \subsection{A Full-Benchmark Provider Run Shows The Screen Is Not Enough}
 
-The $14$-task provider screen is useful for broadening model coverage, but it is
+The targeted provider screen is useful for broadening model coverage, but it is
 still a targeted slice. To test how far that slice extrapolates, we run
-\texttt{gpt-5-chat} on all $54$ official tasks. The full sweep reaches
-\processmetric$=21/54$ and \resultmetric$=16/54$. Table~\ref{tab:provider-full54-domain}
-shows that these successes are again strongly concentrated. Office contributes
-$8/9$ official \resultmetric success, web contributes $4/6$, and security
-contributes $3/9$. By contrast, speech remains at $0/8$, physiological signals
-stay at $0/3$ official \resultmetric despite two \processmetric-positive rows,
-image contributes only $1/18$, and video stays at $0/1$.
+\texttt{gpt-5-chat} on the full benchmark. Table~\ref{tab:provider-full54-domain}
+shows that the resulting successes are again strongly concentrated. Office, web,
+and security dominate the successful domains. By contrast, speech remains dark,
+physiological signals stay in the graded-but-unsuccessful regime, image only
+activates narrowly, and video stays dark.
 
 \input{tables/provider_full54_domain}
 
@@ -189,24 +186,24 @@ targeted provider screen, yet the full-benchmark run yields
 \processmetric$=$True, \resultmetric$=$False on \texttt{NeuroKit\_01} and
 \texttt{NeuroKit\_02}, followed by a complete failure on
 \texttt{NeuroKit\_03}. The image side remains even narrower: the only official
-\resultmetric-positive image task is \texttt{SuperResolution\_03}; the other
-$17$ image rows and the lone video row remain unsuccessful.
+\resultmetric-positive image task is \texttt{SuperResolution\_03}; the rest of
+the image/video slice remains unsuccessful.
 
 This is the clearest reason not to treat a targeted provider slice as a hidden
 replacement leaderboard. The screen correctly shows that some open-8 zeros are
 not benchmark-wide impossibilities: provider models can light up
 \texttt{Scrapy}, \texttt{NeuroKit}, and broader office families. But the
-full-$54$ provider run shows that family activation and family robustness are
+full-benchmark provider run shows that family activation and family robustness are
 not the same claim. A short screen can reveal that a family is reachable at
 all, while still overstating how consistently that reachability extends across
 the benchmark's full task distribution.
 
 \subsection{The \processmetric$=$True, \resultmetric$=$False Regime Clusters}
 
-The open-8 cohort contains $11$ rows with official \processmetric$=$True and
-\resultmetric$=$False. These rows are not spread evenly across the benchmark.
-They cluster in \texttt{Eparse} ($3$ rows), \texttt{PDFPlumber} ($3$ rows),
-\texttt{Scrapy} ($3$ rows), and \texttt{NeuroKit} ($2$ rows). The benchmark's
+The comparable local cohort contains a visible band of official
+\processmetric$=$True and \resultmetric$=$False outcomes. These rows are not
+spread evenly across the benchmark. They cluster in \texttt{Eparse},
+\texttt{PDFPlumber}, \texttt{Scrapy}, and \texttt{NeuroKit}. The benchmark's
 official comments show that this regime is heterogeneous. On
 \texttt{PDFPlumber\_02}, multiple models reach grading but miss the required
 $75\%$ cell-level threshold, e.g., $64.92\%$ for

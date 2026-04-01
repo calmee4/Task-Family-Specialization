@@ -43,7 +43,7 @@ than to a new evaluation methodology.
 The supplementary provider screen adds one more practical lesson. Papers often
 use one strong provider model as a qualitative control and then discuss ``closed
 models'' as if they formed one stable reference class. Our local evidence does
-not support that shortcut. On the same $14$ official tasks, \texttt{gpt-5-chat},
+not support that shortcut. On the same targeted GitTaskBench slice, \texttt{gpt-5-chat},
 \texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro} occupy very different parts of the
 \processmetric/\resultmetric space. This does not prove a frontier ranking, but
 it does show that provider breadth matters even for a conservative measurement
@@ -62,13 +62,13 @@ one anecdotal frontier run.
 
 \subsection{Targeted Screens Need Full-Benchmark Backstops}
 
-The supplementary \texttt{gpt-5-chat} full-$54$ run adds a second lesson. A
+The supplementary \texttt{gpt-5-chat} full-benchmark run adds a second lesson. A
 targeted screen is good at finding activation points, but it can be optimistic
 about how stable those activations are once the full benchmark distribution is
-restored. On the targeted $14$-task screen, \texttt{gpt-5-chat} looks broadly
-active across seven families. On the full benchmark, the same model still
+restored. On the targeted provider screen, \texttt{gpt-5-chat} looks broadly
+active across multiple families. On the full benchmark, the same model still
 performs strongly by local standards, but the mass remains concentrated in
-office, web, and security, with only one successful image task, no successful
+office, web, and security, with only a narrow image exception, no successful
 speech tasks, and no successful video task. \texttt{NeuroKit} is the clearest
 internal warning sign: it appears as a success-bearing family in the screen but
 falls back into the graded-but-unsuccessful regime on the full family slice.
@@ -103,7 +103,7 @@ systems improved in the same way at all.
 
 The paper has clear limits. First, the main evidence is local-run rather than a
 synchronized scrape of the public \gittaskbench leaderboard. Second, broader
-frontier API coverage currently exists only on the two-task shared
+frontier API coverage currently exists only on the small shared
 \texttt{Trafilatura} slice, where we keep the latest local run per model-task
 pair rather than a synchronized same-day rerun. Third, some
 \processmetric$=$False mass may still reflect local harness brittleness rather
