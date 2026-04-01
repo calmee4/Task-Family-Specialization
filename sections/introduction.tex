@@ -30,10 +30,10 @@ task criterion. Some traces never reach grading; others reach grading but still
 fail. If both cases are collapsed into a single final success rate, important
 structure disappears.
 
-Our study is intentionally conservative. The main cohort is a local comparable
-open-model sweep on \gittaskbench. We then add a smaller
-\texttt{Trafilatura\_01/02} slice that extends coverage to locally available
-provider models, including \texttt{gpt-5.2} and
+The empirical design stays deliberately traceable. The main cohort is a local
+comparable open-model sweep on \gittaskbench. We then add a smaller
+\texttt{Trafilatura\_01/02} slice on web-extraction tasks that extends coverage
+to locally available provider models, including \texttt{gpt-5.2} and
 \texttt{Gemini-2.5-Pro}. We also add a targeted provider screen on
 \texttt{gpt-5-chat}, \texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro} so the paper
 does not reduce to a purely within-open-model comparison. For the shared-task
@@ -43,6 +43,11 @@ outputs. Derived rates and heatmaps are marked as paper-side summaries rather
 than as new benchmark metrics. Finally, we add one full-benchmark
 \texttt{gpt-5-chat} provider sweep to test whether the targeted screen remains
 representative once the full benchmark distribution is restored.
+
+The evidence hierarchy is intentional. The comparable local cohort is the
+paper's primary evidence. The targeted provider screen and the full-benchmark
+\texttt{gpt-5-chat} run are separate robustness checks, and the shared
+\texttt{Trafilatura} slice is used only as a cross-model existence proof.
 
 Three findings motivate the paper. First, official success is narrow and
 domain-skewed. In the comparable local cohort, all observed \resultmetric mass
@@ -68,7 +73,7 @@ global \resultmetric rate hides family-specific competence and a structured
 benchmark's own outputs.
 
 \paragraph{Contributions.}
-This paper makes four bounded contributions.
+This paper makes four concrete contributions.
 \begin{enumerate}[leftmargin=1.25em]
 \item We construct a traceable official-metric audit of \gittaskbench over a
 comparable local cohort and a broader shared-task slice, while keeping the
@@ -82,3 +87,11 @@ task-family specialization across models.
 regime that clusters in structured extraction families and should be reported
 explicitly in future repo-grounded evaluations.
 \end{enumerate}
+
+\paragraph{Scope and Epistemic Stance.}
+This paper is a development study on auditable local runs, not a synchronized
+public-leaderboard scrape. We report exact observed
+\processmetric/\resultmetric counts from those runs, and we use the provider
+slices as separate robustness checks rather than as claims about a stable
+frontier ranking. The resulting claims are descriptive and benchmark-facing,
+not inferential estimates over repeated random seeds.

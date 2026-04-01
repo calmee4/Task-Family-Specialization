@@ -28,7 +28,7 @@ and video are complete zeros.
         \includegraphics[width=\textwidth]{figures/figure_domain_summary.pdf}
         \caption{Paper-side summaries aggregated from official outputs.}
     \end{subfigure}
-    \caption{Global official scores hide a strongly skewed success distribution. The benchmark's observed success mass is concentrated in office, security, web, and speech families, while image and video are complete zeros in the comparable local cohort.}
+    \caption{Comparable local cohort under GitTaskBench official metrics. Global totals obscure the concentration of observed success in office, security, web, and speech, while image and video remain dark.}
     \label{fig:overview}
 \end{figure*}
 
@@ -98,16 +98,18 @@ reducing to a purely within-Qwen comparison, although same-task non-Qwen
 coverage remains limited. The shared-task \texttt{Trafilatura} slice extends
 the point further. Table~\ref{tab:shared-trafilatura} shows that
 \texttt{gpt-5.2} and \texttt{Gemini-2.5-Pro} both achieve official
-\processmetric$=$1, \resultmetric$=$1 on \texttt{Trafilatura\_02}. Meanwhile,
-\texttt{Qwen3-32B} is the only model in the local roster that reaches official
-success on \texttt{Trafilatura\_01}.
+\processmetric$=$1, \resultmetric$=$1 on \texttt{Trafilatura\_02}. The local
+open-model cohort likewise contains a \texttt{Trafilatura\_01} success via
+\texttt{Qwen3-32B}. The point of the table is therefore existential rather than
+rank-based: official non-Qwen successes already appear once the same benchmark
+tasks are aligned.
 
 \input{tables/shared_trafilatura}
 
-The shared-task slice is small and not synchronized as a frontier-wide rerun, so
-we do not claim a stable frontier ranking. The supported claim is narrower:
-once the same official tasks are aligned, official non-Qwen successes already
-appear in local evidence.
+The shared-task slice is aligned by task but not synchronized as a frontier-wide
+rerun, so we treat it only as an existence proof rather than as a calibrated
+cross-model ranking. The supported claim is narrower: once the same official
+tasks are aligned, official non-Qwen successes already appear in local evidence.
 
 \subsection{A Supplementary Provider Screen Changes The Active Families}
 
@@ -127,7 +129,7 @@ screen on both official fields and spans the broadest family footprint.
 \texttt{Gemini-2.5-Pro} reaches official success only on
 \texttt{PDFPlumber\_01}. The provider screen therefore broadens the evidence
 base, but it does not behave like a single homogeneous ``closed-model'' control
-condition.
+condition or a hidden replacement leaderboard.
 
 The family pattern is more informative than the totals. Both GPT-family models
 convert \texttt{Scrapy\_03} and \texttt{NeuroKit\_01} into official

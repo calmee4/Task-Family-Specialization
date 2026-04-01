@@ -28,8 +28,8 @@ provides a compact benchmark headline. Second, the same table or a companion
 figure should report family or domain slices, so the reader can see where the
 success mass actually lands. Third, the paper should expose at least a small
 sample of official \processmetric$=$True, \resultmetric$=$False comments from
-the families that dominate that regime. Fourth, any supplementary slice, such as
-our provider screen, should be labeled explicitly as a targeted robustness check
+the families that dominate that regime. Fourth, any separate targeted slice,
+such as our provider screen, should be labeled explicitly as a robustness check
 rather than silently merged into the main benchmark cohort.
 
 This standard is intentionally lightweight. It does not require trajectory
@@ -40,7 +40,7 @@ than to a new evaluation methodology.
 
 \subsection{Providers Are Not One Control Condition}
 
-The supplementary provider screen adds one more practical lesson. Papers often
+The targeted provider screen adds one more practical lesson. Papers often
 use one strong provider model as a qualitative control and then discuss ``closed
 models'' as if they formed one stable reference class. Our local evidence does
 not support that shortcut. On the same targeted GitTaskBench slice, \texttt{gpt-5-chat},
@@ -62,7 +62,7 @@ one anecdotal frontier run.
 
 \subsection{Targeted Screens Need Full-Benchmark Backstops}
 
-The supplementary \texttt{gpt-5-chat} full-benchmark run adds a second lesson. A
+The separate \texttt{gpt-5-chat} full-benchmark run adds a second lesson. A
 targeted screen is good at finding activation points, but it can be optimistic
 about how stable those activations are once the full benchmark distribution is
 restored. On the targeted provider screen, \texttt{gpt-5-chat} looks broadly
@@ -98,6 +98,31 @@ important as agent papers become more incremental. Once multiple papers begin to
 cluster around small absolute gains, family-level slices and the
 \processmetric/\resultmetric split will be necessary for knowing whether two
 systems improved in the same way at all.
+
+\subsection{Working Hypotheses Behind The Family Patterns}
+
+The current paper is descriptive, but the observed patterns already suggest
+testable mechanisms. The clustered \processmetric$=$True,
+\resultmetric$=$False regime is concentrated in families with schema-sensitive
+or threshold-sensitive grading. \texttt{Eparse}, \texttt{PDFPlumber},
+\texttt{Scrapy}, and \texttt{NeuroKit} all require the agent to produce
+structured outputs that survive parsing and field-level validation after the
+trace has already reached grading. The benchmark comments are consistent with
+that picture: threshold misses, XML parsing failures, and evaluation-side
+record-processing errors all preserve enough execution to become gradeable while
+still failing the task criterion.
+
+A second working hypothesis is that family specialization reflects different
+mixtures of prior tool familiarity, data exposure, and output-format control
+rather than one scalar notion of ``agent strength.'' The leading Qwen models do
+not spend their success budget on the same families, and the provider screen
+changes which web and physiological-signal families activate without rescuing
+the image/video stressors. A plausible interpretation is that structured
+extraction, light web processing, and speech JSON tasks reward different priors,
+while image/video families remain bottlenecked by heavier external dependencies
+and repo-specific execution demands under the current agent setup. We do not
+test these mechanisms here, but they define concrete targets for the next stage
+of trajectory-level analysis.
 
 \subsection{Limitations}
 

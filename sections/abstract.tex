@@ -3,12 +3,12 @@ repository-grounded tasks already expose a richer official distinction between
 reaching the benchmark's grading stage and actually satisfying the task
 criterion. We study that distinction in \gittaskbench using only the
 benchmark's official \processmetric/\resultmetric outputs. Our main cohort is a
-comparable local open-model sweep on \gittaskbench. We add a broader shared-task
-slice on \texttt{Trafilatura\_01/02} that extends coverage to locally available
-provider models including \texttt{gpt-5.2} and \texttt{Gemini-2.5-Pro}, plus a
-targeted provider screen across \texttt{gpt-5-chat}, \texttt{gpt-5.2}, and
-\texttt{Gemini-2.5-Pro}, plus one supplementary full-benchmark
-\texttt{gpt-5-chat} sweep. Three empirical patterns emerge. First,
+same-harness local open-model sweep over the full official task set. We
+supplement it with a shared-task \texttt{Trafilatura\_01/02} slice that extends
+coverage to locally available provider models including \texttt{gpt-5.2} and
+\texttt{Gemini-2.5-Pro}, a targeted provider screen across
+\texttt{gpt-5-chat}, \texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro}, and one
+full-benchmark \texttt{gpt-5-chat} run. Three empirical patterns emerge. First,
 official \resultmetric success is narrow and domain-skewed: in the comparable
 local cohort, all observed \resultmetric mass lies in office, security, web,
 and speech families, while image and video families are complete zeros. Second,
@@ -22,7 +22,7 @@ gains extend across task families. Third, official
 \resultmetric$=$False rows are not uniformly distributed; they cluster in
 structured extraction families such as \texttt{Eparse}, \texttt{PDFPlumber},
 \texttt{Scrapy}, and \texttt{NeuroKit}. These findings support a narrow
-measurement claim rather than a new benchmark or a new metric:
-repo-grounded agent evaluation should report the benchmark's official
-\processmetric/\resultmetric split and family-level slices, not only a single
-global pass rate.
+measurement claim: repo-grounded agent evaluation should report the benchmark's
+official \processmetric/\resultmetric split and family-level slices, not only a
+single global pass rate. This is a development study on local runs rather than
+a public-leaderboard or frontier-ranking paper.

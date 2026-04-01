@@ -45,6 +45,14 @@ FAMILY_TO_DOMAIN = {
 
 DOMAIN_ORDER = ["Office", "Security", "Web", "Speech", "Physio", "Image", "Video"]
 
+TABLE_HEADER = "cyan!12"
+TABLE_ALT = "cyan!4"
+MODEL_PROCESS_COLOR = "#9fd3f2"
+MODEL_RESULT_COLOR = "#ffc4b3"
+DOMAIN_PROCESS_COLOR = "#b7e4c7"
+DOMAIN_RESULT_COLOR = "#ffd8a8"
+HEATMAP_CMAP = "GnBu"
+
 PRETTY_MODEL = {
     "Qwen2.5-14B-Instruct": "Qwen2.5-14B",
     "Qwen2.5-32B-Instruct": "Qwen2.5-32B",
@@ -116,16 +124,16 @@ def build_model_summary_table(rows):
     )
     lines = [
         "\\begin{table}[t]",
-        "\\caption{Official GitTaskBench summary on the comparable local cohort.}",
+        "\\caption{Comparable local open-model cohort on the full official GitTaskBench task roster. Process and Result are counts of official \\processmetric$=$True and \\resultmetric$=$True rows per model.}",
         "\\label{tab:model-summary}",
         "\\centering",
         "\\small",
         "\\begin{tabular}{lcc}",
         "\\toprule",
-        "\\rowcolor{blue!12}",
+        f"\\rowcolor{{{TABLE_HEADER}}}",
         "Model & Process & Result \\\\",
         "\\midrule",
-        "\\rowcolors{2}{blue!4}{white}",
+        f"\\rowcolors{{2}}{{{TABLE_ALT}}}{{white}}",
     ]
     for row in rows:
         lines.append(
@@ -147,16 +155,16 @@ def build_domain_table(row_records):
 
     lines = [
         "\\begin{table}[t]",
-        "\\caption{Domain-level concentration under official GitTaskBench metrics. Process and Result are paper-side aggregates over official outputs.}",
+        "\\caption{Comparable local cohort summarized by a fixed family-to-domain map. Process and Result are paper-side aggregates of official \\processmetric$=$True and \\resultmetric$=$True rows.}",
         "\\label{tab:domain-summary}",
         "\\centering",
         "\\small",
         "\\begin{tabular}{lrr}",
         "\\toprule",
-        "\\rowcolor{blue!12}",
+        f"\\rowcolor{{{TABLE_HEADER}}}",
         "Domain & Process & Result \\\\",
         "\\midrule",
-        "\\rowcolors{2}{blue!4}{white}",
+        f"\\rowcolors{{2}}{{{TABLE_ALT}}}{{white}}",
     ]
     for domain in DOMAIN_ORDER:
         item = stats[domain]
@@ -176,16 +184,16 @@ def build_shared_table(rows):
 
     lines = [
         "\\begin{table}[t]",
-        "\\caption{Latest shared-task official outcomes across all locally available models. Each cell reports Process/Result.}",
+        "\\caption{Latest local runs on shared benchmark tasks \\texttt{Trafilatura\\_01} and \\texttt{Trafilatura\\_02} across open and provider models. Each cell reports the benchmark's official \\processmetric/\\resultmetric pair for that task.}",
         "\\label{tab:shared-trafilatura}",
         "\\centering",
         "\\small",
         "\\begin{tabular}{lcc}",
         "\\toprule",
-        "\\rowcolor{blue!12}",
+        f"\\rowcolor{{{TABLE_HEADER}}}",
         "Model & T01 & T02 \\\\",
         "\\midrule",
-        "\\rowcolors{2}{blue!4}{white}",
+        f"\\rowcolors{{2}}{{{TABLE_ALT}}}{{white}}",
     ]
     for model in sorted(statuses):
         t1 = statuses[model].get(task_labels[0], "--")
@@ -209,17 +217,17 @@ def build_provider_screen_table(model_rows):
 
     lines = [
         "\\begin{table}[t]",
-        "\\caption{Supplementary GitTaskBench provider screen. Official outcomes are reported separately from the comparable local cohort.}",
+        "\\caption{Targeted provider robustness screen covering the main success-bearing families, the main graded-but-unsuccessful families, and one image/video stress check. Reported separately from the comparable local cohort; listed families contain at least one official \\resultmetric$=$True row.}",
         "\\label{tab:provider-screen}",
         "\\centering",
         "\\small",
         "\\setlength{\\tabcolsep}{3.5pt}",
         "\\begin{tabular}{@{}p{0.17\\columnwidth}ccp{0.47\\columnwidth}@{}}",
         "\\toprule",
-        "\\rowcolor{blue!12}",
+        f"\\rowcolor{{{TABLE_HEADER}}}",
         "Model & Process & Result & Families with Result \\\\",
         "\\midrule",
-        "\\rowcolors{2}{blue!4}{white}",
+        f"\\rowcolors{{2}}{{{TABLE_ALT}}}{{white}}",
     ]
     for row in rows:
         lines.append(
@@ -250,16 +258,16 @@ def build_provider_full54_domain_table(rows):
 
     lines = [
         "\\begin{table}[t]",
-        "\\caption{Supplementary full-benchmark \\texttt{gpt-5-chat} GitTaskBench run summarized by domain. Process and Result are paper-side aggregates over official outputs.}",
+        "\\caption{Supplementary full-benchmark \\texttt{gpt-5-chat} run summarized by the same fixed family-to-domain map used for the comparable local cohort. Process and Result are paper-side aggregates over official outputs.}",
         "\\label{tab:provider-full54-domain}",
         "\\centering",
         "\\small",
         "\\begin{tabular}{lrr}",
         "\\toprule",
-        "\\rowcolor{blue!12}",
+        f"\\rowcolor{{{TABLE_HEADER}}}",
         "Domain & Process & Result \\\\",
         "\\midrule",
-        "\\rowcolors{2}{blue!4}{white}",
+        f"\\rowcolors{{2}}{{{TABLE_ALT}}}{{white}}",
     ]
     for domain in DOMAIN_ORDER:
         item = stats[domain]
@@ -288,8 +296,10 @@ def plot_model_summary(rows):
     y = np.arange(len(labels))
     h = 0.38
     fig, ax = plt.subplots(figsize=(8.2, 4.8))
-    ax.barh(y + h / 2, process, height=h, color="#4ea8de", label="Process")
-    ax.barh(y - h / 2, result, height=h, color="#f4a261", label="Result")
+    fig.patch.set_facecolor("white")
+    ax.set_facecolor("white")
+    ax.barh(y + h / 2, process, height=h, color=MODEL_PROCESS_COLOR, label="Process")
+    ax.barh(y - h / 2, result, height=h, color=MODEL_RESULT_COLOR, label="Result")
     ax.set_yticks(y)
     ax.set_yticklabels(labels, fontsize=8)
     ax.set_xlabel("Official success count")
@@ -323,8 +333,10 @@ def plot_domain_summary(row_records):
     x = np.arange(len(DOMAIN_ORDER))
     w = 0.36
     fig, ax = plt.subplots(figsize=(8.0, 3.8))
-    ax.bar(x - w / 2, process_rates, width=w, color="#2a9d8f", label="Process rate")
-    ax.bar(x + w / 2, result_rates, width=w, color="#e76f51", label="Result rate")
+    fig.patch.set_facecolor("white")
+    ax.set_facecolor("white")
+    ax.bar(x - w / 2, process_rates, width=w, color=DOMAIN_PROCESS_COLOR, label="Process rate")
+    ax.bar(x + w / 2, result_rates, width=w, color=DOMAIN_RESULT_COLOR, label="Result rate")
     ax.set_xticks(x)
     ax.set_xticklabels(DOMAIN_ORDER, fontsize=8)
     ax.set_ylim(0, 0.25)
@@ -373,7 +385,9 @@ def plot_task_heatmap(row_records):
             matrix[i, j] = lookup.get((model, task_id), 0)
 
     fig, ax = plt.subplots(figsize=(8.4, 3.8))
-    im = ax.imshow(matrix, cmap="YlGnBu", aspect="auto", vmin=0, vmax=1)
+    fig.patch.set_facecolor("white")
+    ax.set_facecolor("white")
+    im = ax.imshow(matrix, cmap=HEATMAP_CMAP, aspect="auto", vmin=0, vmax=1)
     ax.set_yticks(np.arange(len(models)))
     ax.set_yticklabels([pretty_model(m) for m in models], fontsize=8)
     ax.set_xticks(np.arange(len(selected_tasks)))
