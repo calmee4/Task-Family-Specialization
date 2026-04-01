@@ -95,6 +95,12 @@ def pretty_model(name):
     return PRETTY_MODEL.get(name, name)
 
 
+def format_family_list(text):
+    if not text:
+        return "--"
+    return escape_tex(text.replace(";", ", "))
+
+
 def build_model_summary_table(rows):
     rows = sorted(
         rows,
@@ -112,8 +118,10 @@ def build_model_summary_table(rows):
         "\\small",
         "\\begin{tabular}{lcc}",
         "\\toprule",
+        "\\rowcolor{blue!12}",
         "Model & Process & Result \\\\",
         "\\midrule",
+        "\\rowcolors{2}{blue!4}{white}",
     ]
     for row in rows:
         lines.append(
@@ -141,8 +149,10 @@ def build_domain_table(row_records):
         "\\small",
         "\\begin{tabular}{lrr}",
         "\\toprule",
+        "\\rowcolor{blue!12}",
         "Domain & Process & Result \\\\",
         "\\midrule",
+        "\\rowcolors{2}{blue!4}{white}",
     ]
     for domain in DOMAIN_ORDER:
         item = stats[domain]
@@ -168,8 +178,10 @@ def build_shared_table(rows):
         "\\small",
         "\\begin{tabular}{lcc}",
         "\\toprule",
+        "\\rowcolor{blue!12}",
         "Model & T01 & T02 \\\\",
         "\\midrule",
+        "\\rowcolors{2}{blue!4}{white}",
     ]
     for model in sorted(statuses):
         t1 = statuses[model].get(task_labels[0], "--")
@@ -197,17 +209,19 @@ def build_provider_screen_table(model_rows):
         "\\label{tab:provider-screen}",
         "\\centering",
         "\\small",
-        "\\begin{tabular}{p{0.18\\columnwidth}ccp{0.42\\columnwidth}}",
+        "\\begin{tabular}{p{0.18\\columnwidth}ccp{0.50\\columnwidth}}",
         "\\toprule",
+        "\\rowcolor{blue!12}",
         "Model & Process & Result & Families with Result \\\\",
         "\\midrule",
+        "\\rowcolors{2}{blue!4}{white}",
     ]
     for row in rows:
         lines.append(
             f'{escape_tex(pretty_model(row["model"]))} & '
             f'{row["official_process_true"]} & '
             f'{row["official_result_true"]} & '
-            f'{escape_tex(row["families_with_official_result"] or "--")} \\\\'
+            f'{format_family_list(row["families_with_official_result"])} \\\\'
         )
     lines.extend([
         "\\bottomrule",
@@ -236,8 +250,10 @@ def build_provider_full54_domain_table(rows):
         "\\small",
         "\\begin{tabular}{lrr}",
         "\\toprule",
+        "\\rowcolor{blue!12}",
         "Domain & Process & Result \\\\",
         "\\midrule",
+        "\\rowcolors{2}{blue!4}{white}",
     ]
     for domain in DOMAIN_ORDER:
         item = stats[domain]
@@ -266,8 +282,8 @@ def plot_model_summary(rows):
     y = np.arange(len(labels))
     h = 0.38
     fig, ax = plt.subplots(figsize=(8.2, 4.8))
-    ax.barh(y + h / 2, process, height=h, color="#8ecae6", label="Process")
-    ax.barh(y - h / 2, result, height=h, color="#1d3557", label="Result")
+    ax.barh(y + h / 2, process, height=h, color="#4ea8de", label="Process")
+    ax.barh(y - h / 2, result, height=h, color="#f4a261", label="Result")
     ax.set_yticks(y)
     ax.set_yticklabels(labels, fontsize=8)
     ax.set_xlabel("Official success count")
@@ -275,6 +291,8 @@ def plot_model_summary(rows):
     ax.grid(axis="x", linestyle="--", alpha=0.3)
     ax.legend(frameon=False, loc="lower right")
     ax.set_title("Comparable local cohort under GitTaskBench official metrics")
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
     for idx, value in enumerate(process):
         ax.text(value + 0.12, y[idx] + h / 2, str(value), va="center", fontsize=8)
     for idx, value in enumerate(result):
@@ -299,8 +317,8 @@ def plot_domain_summary(row_records):
     x = np.arange(len(DOMAIN_ORDER))
     w = 0.36
     fig, ax = plt.subplots(figsize=(8.0, 3.8))
-    ax.bar(x - w / 2, process_rates, width=w, color="#a8dadc", label="Process rate")
-    ax.bar(x + w / 2, result_rates, width=w, color="#457b9d", label="Result rate")
+    ax.bar(x - w / 2, process_rates, width=w, color="#2a9d8f", label="Process rate")
+    ax.bar(x + w / 2, result_rates, width=w, color="#e76f51", label="Result rate")
     ax.set_xticks(x)
     ax.set_xticklabels(DOMAIN_ORDER, fontsize=8)
     ax.set_ylim(0, 0.25)
@@ -308,6 +326,8 @@ def plot_domain_summary(row_records):
     ax.grid(axis="y", linestyle="--", alpha=0.3)
     ax.legend(frameon=False, loc="upper right")
     ax.set_title("Success mass concentrates in office, security, web, and speech")
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
     for idx, domain in enumerate(DOMAIN_ORDER):
         total = stats[domain]["total"]
         ax.text(
@@ -347,7 +367,7 @@ def plot_task_heatmap(row_records):
             matrix[i, j] = lookup.get((model, task_id), 0)
 
     fig, ax = plt.subplots(figsize=(8.4, 3.8))
-    im = ax.imshow(matrix, cmap="Blues", aspect="auto", vmin=0, vmax=1)
+    im = ax.imshow(matrix, cmap="YlGnBu", aspect="auto", vmin=0, vmax=1)
     ax.set_yticks(np.arange(len(models)))
     ax.set_yticklabels([pretty_model(m) for m in models], fontsize=8)
     ax.set_xticks(np.arange(len(selected_tasks)))
