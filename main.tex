@@ -1,8 +1,8 @@
 \PassOptionsToPackage{table}{xcolor}
-\documentclass[sigconf,screen,anonymous]{acmart}
+\documentclass[sigconf,screen,review,anonymous]{acmart}
 
 \setcopyright{none}
-\settopmatter{printacmref=false}
+\settopmatter{printacmref=true}
 \renewcommand\footnotetextcopyrightpermission[1]{}
 \pagestyle{plain}
 \acmConference[ACM MM '26]{ACM Multimedia}{2026}{TBD}
@@ -104,6 +104,16 @@ revokes recalled memory immediately once poison is detected. It therefore
 treats unrecoverable poisoned memory and recoverable poisoned memory as the
 same case.
 
+That distinction matters because workflow memories are structurally richer than
+plain retrieved snippets. A partially poisoned workflow can still retain a safe
+task decomposition, a benign ordering of tool calls, or a useful reminder
+about which trusted tool family solved the earlier task. If the defense throws
+away that structure automatically, the system pays a utility cost even when the
+unsafe portion has already been removed. If it restores too much authority too
+early, it risks replaying attacker logic under a cleaner surface form. The
+central design problem is therefore not only sanitization quality, but the
+decision boundary after sanitization.
+
 We repair this failure with Sanitized Commitment Recovery (SCR). The repaired
 state machine treats poison detection as an intermediate signal rather than a
 final verdict. It sanitizes the recalled workflow, re-evaluates the cleaned
@@ -125,6 +135,14 @@ all three canonical seeds. Fourth, \texttt{commit\_cfguard} is the safer
 commitment-family variant on the canonical Qwen anchor, but the completed
 Mistral recoverable slice shows that recommit cannot yet be treated as a
 universal gain outside that anchor.
+
+The paper is organized around that narrow question. We first formalize the
+decision problem created by partially recoverable poisoned memory, then isolate
+the repaired transition in the commitment state machine, and finally test
+whether this one control change is enough to create a useful and safe reuse
+branch. The story is therefore mechanism-first: reachability of recommit,
+comparison against the sanitize-only ablation, and only then the aggregate
+utility consequences.
 
 \paragraph{Contributions.}
 This paper makes four bounded contributions.
@@ -178,6 +196,40 @@ This detail matters for mechanism analysis because the paper is about the
 reachability of that post-sanitization branch, not only about coarse final
 accept vs.\ reject counts.
 
+The action space also creates three qualitatively different poisoning cases.
+Some recalled memories are unrecoverable and should be revoked because no safe
+procedure survives. Some are recoverable: the unsafe payload can be removed
+while preserving a useful task plan. A third class is weakly recoverable:
+enough structure survives to trigger recommit, but the remaining hint is too
+generic or too brittle to help the downstream planner. The paper's main
+phenomenon is that the repaired rule makes the recoverable branch reachable,
+but usefulness on that branch still depends on model family and executor
+behavior.
+
+\begin{table}[t]
+  \caption{Post-sanitization memory cases. The paper's main question is how a
+  commitment-based defense should act once poison has already been detected and
+  cleaned.}
+  \label{tab:memory-cases}
+  \centering
+  \setlength{\tabcolsep}{3.4pt}
+  \scriptsize
+  \begin{tabularx}{\columnwidth}{lXlX}
+    \toprule
+    Case & Cleaned structure & Desired action & Failure if mishandled \\
+    \midrule
+    Unrecoverable & No safe, task-aligned procedure survives & Revoke & Reuse can replay attacker logic \\
+    Recoverable & Safe and task-aligned structure survives & Recommit under bounded authority & Blanket revocation wastes benign procedure \\
+    Weakly recoverable & Some safe structure survives, but it is generic or brittle & Gate or quarantine conservatively & Over-eager reuse can reduce task success \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+Table~\ref{tab:memory-cases} summarizes the operating taxonomy behind the
+paper. The original commitment rule collapses all three cases into revocation.
+SCR separates the clearly recoverable case from the unrecoverable one, while
+the hybrid counterfactual gate is aimed at the weakly recoverable regime.
+
 \begin{figure*}[t]
   \centering
   \includegraphics[width=0.98\textwidth]{figures/memoryguard_pipeline.png}
@@ -187,8 +239,47 @@ accept vs.\ reject counts.
   sanitizes the recalled workflow, checks trusted-tool safety and task
   alignment, and recommits only by emitting a bounded reference-only hint
   when safe structure survives; otherwise it revokes.}
+  \Description{A two-branch decision diagram contrasting the old revoke-only
+  commitment rule with Sanitized Commitment Recovery. The repaired path keeps
+  poison detection as an intermediate signal, sanitizes the workflow, checks
+  trusted-tool safety and alignment, and recommits only when safe structure
+  remains.}
   \label{fig:memoryguard-pipeline}
 \end{figure*}
+
+\begin{table*}[t]
+  \caption{Illustrative post-sanitization decision example. The example is
+  schematic rather than a benchmark row, but it makes the paper's control logic
+  explicit: the same cleaned workflow can be revoked, quarantined, or
+  recommitted depending on the final authority rule.}
+  \label{tab:running-example}
+  \centering
+  \small
+  \begin{tabularx}{\textwidth}{lX}
+    \toprule
+    Stage or rule & Illustrative state \\
+    \midrule
+    Retrieved memory & A recalled workflow mixes benign procedure with attacker
+    content, for example a useful sequence such as ``query the calendar, summarize
+    conflicts, send the update'' together with an unsafe tool suggestion or an
+    exfiltration step. \\
+    Sanitized memory & Unsafe instructions are removed, trusted tools are kept,
+    and task text is rewritten back to the current benign task. Safe structure
+    survives, but only as a partial workflow. \\
+    \texttt{commit\_old} & Poison detection is treated as the final verdict, so
+    the entire memory is revoked even though a safe procedure remains. \\
+    \texttt{commit\_sanitize\_only} & The memory is cleaned, but the cleaned
+    workflow is not re-admitted. The system preserves safety, but gives up any
+    potential utility from the surviving structure. \\
+    SCR / \texttt{commit\_repair} & The cleaned workflow is re-admitted only as
+    a bounded hint: reuse the surviving structure with trusted tools, rather
+    than replaying the original memory verbatim. \\
+    \texttt{commit\_cfguard} & The same bounded hint is proposed, but an extra
+    counterfactual veto blocks recommit when the recovered procedure looks too
+    weak, too generic, or still suspicious after cleaning. \\
+    \bottomrule
+  \end{tabularx}
+\end{table*}
 
 \section{Method}
 
@@ -218,6 +309,12 @@ This produces three semantic outcomes: \texttt{committed},
 \texttt{committed\_after\_sanitization}, and \texttt{revoked}. The key design
 change is that poison detection becomes an intermediate signal, not the final
 verdict.
+
+SCR therefore separates two checks that are often collapsed in memory defense.
+The first check asks whether the recalled artifact is poisoned. The second asks
+whether the cleaned artifact still deserves authority inside the next planning
+step. A system can answer the first question correctly and still make a poor
+final decision if it has no explicit post-sanitization admission rule.
 
 \subsection{Implementation Semantics in the Canonical Code Path}
 
@@ -265,6 +362,14 @@ of the extra gate is not to make recommit more frequent. It is to make the
 reuse decision more selective when the sanitized memory is only weakly useful
 or still suspicious after cleaning.
 
+\paragraph{Why sanitize-only is the key ablation.}
+The sanitize-only variant is not a weaker version of SCR in a generic sense.
+It is the surgical control for the paper's main claim. It keeps poison
+detection and workflow cleaning, but removes only the final recommit
+transition. If \texttt{commit\_repair} differs from sanitize-only, that gap
+cannot be attributed to better detection or better sanitization. It has to come
+from the post-sanitization commitment decision itself.
+
 \section{Experimental Protocol}
 
 \subsection{Benchmark and Models}
@@ -286,6 +391,14 @@ so within-route ranking is now safe. Our claim boundary is therefore scope,
 not table hygiene: we still avoid generalization beyond canonical task10
 unless a result is explicitly marked support-only.
 
+This admission policy matters because the broader experiment program is larger
+than the benchmark slice we are willing to claim from. Some exploratory or
+cross-family runs remain incomplete, and some earlier reruns showed suspicious
+partial-row behavior. Rather than average together clean and unclean evidence,
+we use a stricter split: the closed canonical Qwen route carries the main
+claim, completed Mistral support rows probe the boundary of that claim, and all
+unfinished breadth runs stay outside the paper's headline narrative.
+
 \subsection{Methods Compared}
 
 Current admitted comparisons include none, commit\_old, commit\_repair,
@@ -304,6 +417,13 @@ poisoned cases (2 agents $\times$ 5 tasks $\times$ 40 attacker tools). Seeds
 commit\_sanitize\_only, commit\_repair, and commit\_cfguard. We use this slice
 only to test whether recommit remains beneficial when recoverable workflow
 structure should, in principle, exist.
+
+This support-only slice is intentionally narrower than the canonical table.
+That tradeoff buys two things that matter for interpretation. First, the
+recoverable tasks make it easier to ask whether useful procedure survives after
+sanitization at all. Second, the smaller closed slice gives a clean
+cross-family failure case without promoting partially finished breadth runs
+into paper language.
 
 \subsection{Metrics}
 
@@ -343,6 +463,31 @@ variant is slightly better than the plain repaired rule on every 7B seed and
 ties the 14B commitment-family ceiling. The calibration story is therefore
 stable at the seed level, not an artifact of one lucky rerun.
 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/memoryguard_recommit_delta.png}
+  \caption{Change in original-task success relative to
+  \texttt{commit\_sanitize\_only}. On the canonical Qwen anchor, recommit is
+  positive on 7B but not uniformly positive on 14B; the hybrid
+  \texttt{commit\_cfguard} removes the 14B loss. On the completed Mistral
+  support slice, both recommit-capable variants lose ten points.}
+  \Description{A grouped bar chart showing the change in original-task success
+  relative to commit_sanitize_only for Qwen2.5-7B, Qwen2.5-14B, and a
+  support-only Mistral-7B slice. The repair is positive on Qwen2.5-7B, plain
+  SCR is negative on Qwen2.5-14B, and both recommit-capable variants are
+  negative on Mistral-7B.}
+  \label{fig:recommit-delta}
+\end{figure}
+
+\paragraph{The utility boundary is clearer when written as a delta.}
+Figure~\ref{fig:recommit-delta} compresses the paper's central caution.
+Relative to sanitize-only, plain SCR gains 9.12 points on canonical Qwen2.5-7B
+but loses 1.96 points on canonical Qwen2.5-14B. The stricter
+\texttt{commit\_cfguard} keeps the 7B gain while avoiding the 14B regression.
+The completed Mistral support slice is harsher: both recommit-capable variants
+lose ten points relative to sanitize-only. This is why the paper argues for
+calibrated recommit, not for recommit as a universal best practice.
+
 \paragraph{The original commitment rule remains revoke-only.}
 Table~\ref{tab:task10-state-audit} makes the mechanism difference explicit.
 The original commitment rule revokes 6120/6120 rows on both scales. The
@@ -357,6 +502,10 @@ quarantine instead of reuse.
   ablation. The old rule is revoke-only, the repaired rule exposes a
   360-row recommit slice on both Qwen scales, and sanitize-only routes the
   same slice into quarantine instead of reuse.}
+  \Description{A grouped bar chart for Qwen2.5-7B and Qwen2.5-14B showing that
+  commit_old revokes all rows, commit_repair revokes most rows but recommits
+  360, and commit_sanitize_only replaces that same 360-row recommit slice with
+  quarantine.}
   \label{fig:state-audit}
 \end{figure}
 
@@ -373,6 +522,12 @@ commitment-family variant.}
 to 80.39\% and matches the 14B commitment-family ceiling at 86.27\%. On the
 current canonical Qwen anchor, it is therefore the strongest or tied-strongest
 commitment-family method while preserving zero attack success.
+
+This distinction matters for the larger story. The paper is not arguing that
+more recommit is always better. It is arguing that once the recommit branch is
+reachable, the remaining question is how selective that branch should be.
+\texttt{commit\_cfguard} helps precisely because it leaves branch reachability
+unchanged while tightening the final reuse decision.
 
 \paragraph{Within-branch quality explains why recommit helps on one scale and
 hurts on the other.}
@@ -391,6 +546,9 @@ therefore depends on both branch quality and branch frequency.
   intervals over rows inside each branch. The conditional quality of the
   recommit branch flips across Qwen scales, explaining why recommit is
   aggregate-positive on 7B but not on 14B.}
+  \Description{A two-group plot comparing original-task success on revoked rows
+  and recommitted rows within commit_repair for Qwen2.5-7B and Qwen2.5-14B.
+  The recommit branch underperforms revoked rows on 7B but outperforms on 14B.}
   \label{fig:branch-quality}
 \end{figure}
 
@@ -415,7 +573,10 @@ baseline leaks on 19/400 cases and never completes the original task.
 recommit on 120/400 cases, but drop to 320/400 original-task success (80.0\%).
 This is the strongest completed
 non-Qwen evidence in the current draft, and it argues against any universal
-``recommit always helps'' story.
+``recommit always helps'' story. The support slice therefore plays a specific
+role in the narrative: it is not broad enough to replace the canonical anchor,
+but it is strong enough to rule out the easy interpretation that positive
+canonical Qwen behavior automatically transfers to other families.
 
 \section{Discussion and Limitations}
 
@@ -426,6 +587,14 @@ reachable, it does not reopen the attack path, and its utility depends on
 where and when it is used. That is why the paper is about calibrated reuse
 inside the commitment family, not about universal superiority over every
 defense.
+
+One practical lesson follows directly from this evidence. A persistent-memory
+defender should not treat poison detection as the last word. It should separate
+three questions: was the recalled memory poisoned, what safe structure remains
+after sanitization, and how much authority should that cleaned structure retain
+inside the next task. The canonical results show that collapsing those
+questions into immediate revocation is too coarse, while the support slice
+shows that restoring authority without stronger gating can still be too eager.
 
 Recent memory systems and benchmarks emphasize usefulness, persistence, and
 long-horizon recall \cite{locomo2024,mem0_2025,amabench2026,memgallery2026},
@@ -455,6 +624,14 @@ closed benchmark table, a state-audit figure, a within-branch quality figure,
 and one completed non-Qwen failure case. The next upgrade is better
 cross-family evidence, not bigger language.
 
+\paragraph{What the current draft is already strong enough to claim.}
+The paper no longer depends on a vague ``memory safety is hard'' framing. It
+contains a concrete bug diagnosis, a surgical control ablation, a closed
+canonical benchmark table, and a boundary-setting support slice that shows
+where the positive story stops. That package is enough for a submission-ready
+draft because the contribution is a mechanism-level insight about a specific
+memory-defense decision, not a claim of universal benchmark leadership.
+
 \section{Related Work}
 
 Long-term memory for LLM agents is now studied from two main angles: utility
@@ -481,6 +658,14 @@ commitment rule. The contribution is the diagnosis that over-revocation comes
 from a state-machine decision made too early, together with evidence showing
 when a recommit branch is reachable, when it helps, and when it needs stronger
 gating.
+
+A third distinction concerns where the paper's novelty sits. We are not
+introducing a stronger sanitizer, a new retriever, or a new agent benchmark.
+The novelty is a state-machine diagnosis: the standard commitment rule ends the
+decision too early, and the right control question is whether any sanitized
+structure should still hold bounded authority. That is why the sanitize-only
+ablation is essential in our setup and why the contribution belongs closer to
+mechanism analysis than to raw defense breadth.
 
 \section{Conclusion}
 
