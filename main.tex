@@ -41,32 +41,28 @@
 \begin{abstract}
 Persistent memory improves the continuity of tool-augmented agents, but it
 also creates a durable attack surface: a poisoned workflow can be stored once
-and replayed later during planning. In the ASB persistent-memory poisoning
-setting, we study commitment-based memory defense and identify a deterministic
-failure mode in the original commitment rule. Once poison is detected, the
-original state machine revokes the recalled memory immediately, even when
-sanitization removes the unsafe content and leaves recoverable task structure.
-This over-revocation blocks attacks, but it also discards potentially reusable
-benign workflow information. We repair this failure with Sanitized Commitment
-Recovery (SCR), a calibrated commit-after-sanitization rule that detects
-poisoned recall, sanitizes the retrieved workflow, and recommits only when the
-cleaned workflow remains safe and task-aligned; otherwise the memory is
-revoked. We also study a stronger hybrid variant, \texttt{commit\_cfguard},
-which adds a counterfactual veto on top of the repaired recommit logic. On a
-fully closed canonical ASB task10 evaluation over Qwen2.5-7B and Qwen2.5-14B,
-all defended methods preserve zero observed attack success. The repaired
-recommit branch is real and measurable: it activates on 360/6120 rows on both
-scales. But its utility is family-dependent: \texttt{commit\_repair} improves
-over \texttt{commit\_sanitize\_only} on Qwen2.5-7B (79.71\% vs.\ 70.59\%) and
-loses on Qwen2.5-14B (84.31\% vs.\ 86.27\%). The hybrid
-\texttt{commit\_cfguard} is the safer commitment-family variant on the
-canonical Qwen anchor, reaching 80.39\% on 7B and tying the 86.27\%
-commitment-family ceiling on 14B while keeping recommit active. A support-only
-Mistral-7B recoverable slice shows the same tradeoff more sharply:
-recommit-capable variants preserve security but drop from 90.0\% to 80.0\%
-original-task success. These results shift the design question from whether
-agents should recommit after sanitization to when recommit should be enabled
-and how strongly the reuse channel should be calibrated.
+and replayed later during planning. We study this problem in the ASB
+persistent-memory poisoning benchmark and identify a narrower failure than the
+usual safety-utility tradeoff. In the original commitment rule, poison
+detection ends the decision process: the recalled memory is revoked
+immediately, even when sanitization removes the unsafe content and leaves
+task-aligned structure that could still be reused. We repair this failure with
+Sanitized Commitment Recovery (SCR), which treats poison detection as an
+intermediate signal, sanitizes the recalled workflow, and recommits only when
+the cleaned result remains safe and task-aligned. We also evaluate a stronger
+hybrid variant, \texttt{commit\_cfguard}, which adds a counterfactual veto on
+top of the repaired recommit logic. On the fully closed canonical ASB task10
+evaluation over Qwen2.5-7B and Qwen2.5-14B, all defended methods preserve zero
+observed attack success. The recommit branch is real: it activates on
+360/6120 rows on both scales. Its utility effect, however, depends on model
+family. \texttt{commit\_repair} beats \texttt{commit\_sanitize\_only} on
+Qwen2.5-7B (79.71\% vs.\ 70.59\%) and loses on Qwen2.5-14B (84.31\% vs.\
+86.27\%), while \texttt{commit\_cfguard} is the safer commitment-family
+variant on the canonical Qwen anchor. A completed support-only Mistral-7B
+recoverable slice reinforces the same caution: recommit-capable variants keep
+zero attack success but drop original-task success from 90.0\% to 80.0\%.
+Together these results argue for calibrated post-sanitization reuse, not
+blanket revocation and not blanket recommit.
 \end{abstract}
 
 \ccsdesc[500]{Security and privacy~Software and application security}
@@ -79,38 +75,48 @@ and how strongly the reuse channel should be calibrated.
 
 \section{Introduction}
 
-Persistent memory changes the failure modes of tool-augmented agents. Once an
-agent stores a prior workflow and later recalls it for a related task, the
-recalled artifact can influence planning, tool choice, and execution
-structure. This creates a durable poisoning channel: an attacker can seed a
-malicious workflow once and wait for it to be replayed into future decisions.
+Persistent memory is moving from an optional add-on to a core capability of
+LLM agents. Recent systems and benchmarks ask whether agents can retain and
+reuse information over long horizons rather than within a single interaction
+\cite{locomo2024,mem0_2025,amabench2026,memgallery2026}. That shift changes the
+security problem. Once an agent stores a workflow and later recalls it for a
+related task, the recalled artifact can influence planning, tool choice, and
+execution structure. A poisoned memory therefore does not need to win the
+attack immediately. It can be planted once and replayed later through ordinary
+memory reuse.
 
-The obvious defense is to reject suspicious memories aggressively. That
-strategy can suppress attacks, but it can also destroy benign workflow
-structure that the agent ought to preserve. In persistent-memory systems, the
-recalled record often mixes task-relevant procedure with attacker-controlled
-instructions. A defense therefore needs to do more than detect poison; it must
-decide whether any safe structure survives after poison is removed.
+General agent-security work has already shown that injected context,
+compromised observations, and unsafe retrieved content can redirect agent
+behavior \cite{agentdojo2024,asb2025}. Persistent memory replay is a sharper
+case. The recalled object is often not just supporting text. It can contain a
+workflow, tool preferences, or procedural hints that the agent is encouraged
+to treat as prior experience. Defending this setting is not only a matter of
+detecting unsafe content. The system also has to decide whether any safe
+structure survives after the unsafe part is removed.
 
-This paper studies commitment-based defense in the ASB persistent-memory
-poisoning benchmark. We show that the original commitment rule contains a
-deterministic over-revocation failure. Once poisoned recall is detected, the
-original guard revokes the retrieved memory immediately. That decision is too
-coarse: it treats unrecoverable poisoned memory and recoverable poisoned
-memory as the same case.
+Recent memory-oriented defenses mostly approach this problem through admission
+control, validation, or sanitization \cite{amac2026,amemguard2025,mpattack2026}.
+Those mechanisms are sensible, but they leave open a more specific question:
+what should happen after poisoned recall has already been detected and
+sanitized? Our main observation is that a commitment-based defense in the ASB
+memory-poisoning benchmark fails at exactly this point. The original rule
+revokes recalled memory immediately once poison is detected. It therefore
+treats unrecoverable poisoned memory and recoverable poisoned memory as the
+same case.
 
-We repair this failure with Sanitized Commitment Recovery (SCR), a calibrated
-commit-after-sanitization rule. The repaired state machine first detects
-poisoned recall, then sanitizes the retrieved workflow, and finally recommits
-only if the cleaned workflow remains safe and task-aligned. If safe structure
-does not survive sanitization, the memory is revoked. This is not a permissive
-acceptance policy. It is a controlled recovery rule that preserves only
-sanitized, alignment-checked memory.
+We repair this failure with Sanitized Commitment Recovery (SCR). The repaired
+state machine treats poison detection as an intermediate signal rather than a
+final verdict. It sanitizes the recalled workflow, re-evaluates the cleaned
+result for trusted-tool safety and task alignment, and recommits only when
+safe structure survives. This is a narrow change by design. We do not propose
+a new planner, a new retrieval model, or a general-purpose agent security
+framework. We change one decision point in the memory defense logic and test
+what that change does to both mechanism traces and task outcomes.
 
-Our current canonical evidence supports four bounded conclusions. First,
-persistent memory poisoning remains a live attack surface on canonical ASB
-task10: the none baseline still shows non-zero observed attack success on both
-Qwen scales. Second, the old commitment rule is revoke-only, while the
+The resulting evidence supports four bounded conclusions. First, persistent
+memory poisoning remains a live attack surface on canonical ASB task10
+\cite{asb2025}: the none baseline still shows non-zero observed attack success
+on both Qwen scales. Second, the old commitment rule is revoke-only, while the
 repaired rule and its hybrid extension visibly enter a
 recommit-after-sanitization branch. Third, the utility effect of recommit is
 stable but family-dependent: \texttt{commit\_repair} improves over
@@ -263,11 +269,12 @@ or still suspicious after cleaning.
 
 \subsection{Benchmark and Models}
 
-The headline benchmark anchor is canonical ASB poisoned-DB task10. This route
-is the only evidence allowed to carry the main claim. We evaluate two headline
-scales, Qwen2.5-7B and Qwen2.5-14B, and aggregate each method over three
-canonical seeds. Non-canonical task slices and non-Qwen models are reported
-only as support evidence for scope checking and mechanism diagnosis.
+The headline benchmark anchor is canonical ASB poisoned-DB task10
+\cite{asb2025}. This route is the only evidence allowed to carry the main
+claim. We evaluate two headline scales, Qwen2.5-7B and Qwen2.5-14B, and
+aggregate each method over three canonical seeds. Non-canonical task slices
+and non-Qwen models are reported only as support evidence for scope checking
+and mechanism diagnosis.
 
 \subsection{Benchmark Closure and Claim Admission}
 
@@ -412,19 +419,22 @@ non-Qwen evidence in the current draft, and it argues against any universal
 
 \section{Discussion and Limitations}
 
-The paper's central message is now stronger than a pure mechanism note, but it
-is still deliberately bounded. On the canonical Qwen anchor, the table is
-fully closed and safe for ranking. That closure lets us say something more
-precise than ``recommit exists'': recommit helps on one model scale, hurts on
-another, and benefits from stricter gating through \texttt{commit\_cfguard}.
+The main claim of this paper is narrower than a generic memory-safety story.
+On the canonical Qwen anchor, the table is fully closed and safe for ranking,
+so we can now say more than ``recommit exists.'' The repaired branch is
+reachable, it does not reopen the attack path, and its utility depends on
+where and when it is used. That is why the paper is about calibrated reuse
+inside the commitment family, not about universal superiority over every
+defense.
 
-At the same time, the broader generalization story remains support-only. The
-completed Mistral recoverable slice already shows that recommit is not
-universally utility-positive, and the overall strongest canonical defense is
-still the counterfactual baseline rather than our repaired commitment rule.
-These facts are not weaknesses to hide; they define the actual contribution.
-The paper is about calibrated recovery inside the commitment family, not about
-beating every defense on every model.
+Recent memory systems and benchmarks emphasize usefulness, persistence, and
+long-horizon recall \cite{locomo2024,mem0_2025,amabench2026,memgallery2026},
+while recent security work emphasizes attack surfaces, validation, or filtering
+\cite{agentdojo2024,amemguard2025,memorygraft2025}. Our evidence sits between
+these lines. The important failure is not that commitment-based defense is too
+weak on safety, but that it makes the final decision too early. That diagnosis
+is supported on canonical Qwen and challenged by the completed Mistral slice,
+which is exactly why broader generalization remains open.
 
 This draft has four explicit limitations. First, the headline claim is still
 restricted to canonical ASB task10 on Qwen; non-Qwen evidence is currently
@@ -442,23 +452,35 @@ closure. Additional DeepSeek and per-agent Mistral diagnostics can sharpen the
 scope paragraph and the mechanism explanation, but they are no longer required
 to justify the main canonical story. The present version already contains a
 closed benchmark table, a state-audit figure, a within-branch quality figure,
-and one completed non-Qwen failure case. What remains is to tighten the
-cross-family evidence, not to inflate the claims.
+and one completed non-Qwen failure case. The next upgrade is better
+cross-family evidence, not bigger language.
 
 \section{Related Work}
 
-This work touches three nearby areas. First, prompt-injection and agent
-security research has established that externally supplied context can redirect
-agent behavior. Persistent memory makes this risk more durable because the
-attack does not need to be re-injected each time; it can be recalled from
-prior storage. Second, retrieval poisoning and memory corruption work
-highlights the tension between defensive filtering and utility preservation.
-Our setting sharpens that tension because the stored object is not only factual
-evidence, but a workflow-like procedure with tool structure. Third, calibrated
-safe mechanisms try to avoid the false choice between permissive acceptance and
-blanket rejection. SCR belongs to this line: it is a calibrated
-post-sanitization recommit rule rather than a naive accept-all or revoke-all
-policy.
+Long-term memory for LLM agents is now studied from two main angles: utility
+and evaluation. System work such as Mem0 and adaptive admission policies asks
+how to store and retrieve useful memories efficiently
+\cite{mem0_2025,amac2026}. Benchmark work such as LoCoMo, AMA-Bench, and
+Mem-Gallery asks whether agents can retain and use information over long
+horizons \cite{locomo2024,amabench2026,memgallery2026}. These papers make
+long-term memory a first-class capability, but they are not centered on
+corrupted memory state or on post-sanitization authority decisions.
+
+A second line of work focuses directly on security. ASB and AgentDojo
+formalize prompt injection and related attacks in tool-using agents
+\cite{asb2025,agentdojo2024}. Recent memory-specific work studies proactive
+memory validation, poisoning, persistent compromise, and extraction attacks
+\cite{amemguard2025,mpattack2026,memorygraft2025,mempot2026}. This literature
+establishes that memory is a genuine attack surface. What it does not resolve
+is the narrower question we study here: once recalled memory has been flagged
+and sanitized, should a commitment-based defense still allow bounded reuse?
+
+Our answer is different from both blanket filtering and blanket reuse. SCR is
+not a new retrieval system or a new benchmark. It is a repair to a specific
+commitment rule. The contribution is the diagnosis that over-revocation comes
+from a state-machine decision made too early, together with evidence showing
+when a recommit branch is reachable, when it helps, and when it needs stronger
+gating.
 
 \section{Conclusion}
 
@@ -470,14 +492,15 @@ sanitization and alignment checks. The fully closed canonical Qwen task10
 table shows that all defended methods preserve zero observed attack success,
 the original commitment rule remains revoke-only, and the recommit branch is
 real but family-dependent: \texttt{commit\_repair} helps on Qwen2.5-7B and
-hurts on Qwen2.5-14B, while the hybrid \texttt{commit\_cfguard} is the safer
+hurts on Qwen2.5-14B, while \texttt{commit\_cfguard} is the safer
 commitment-family compromise on the canonical anchor. The completed
 support-only Mistral recoverable slice pushes the same lesson further:
 recommit-capable variants preserve security but can still reduce task utility.
-Long-term memory defense should therefore be framed as calibrated recovery,
-not blanket revocation and not blanket recommit. The next step is broader
-cross-family validation of that calibration story, not another round of
-overstated benchmark rhetoric.
+The main point is therefore simple. Persistent-memory defense should reason
+about whether safe structure survives sanitization and should only reuse that
+structure under explicit control. The next step is broader cross-family
+validation of that claim, not a broader claim than the current evidence can
+support.
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{refs}
