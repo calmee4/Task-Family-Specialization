@@ -1,0 +1,44 @@
+\section{Discussion}
+
+\subsection{What Should Be Reported}
+
+Our evidence supports three reporting recommendations for repo-grounded agent
+benchmarks.
+\begin{enumerate}[leftmargin=1.25em]
+\item Report the benchmark's official \processmetric and \resultmetric fields
+separately whenever both are available, so readers can distinguish
+\processmetric$=$False from \processmetric$=$True,
+\resultmetric$=$False outcomes.
+\item Report family or domain slices in addition to one global total.
+\item Include representative official \processmetric$=$True,
+\resultmetric$=$False comments for structured extraction tasks, not only
+aggregate pass counts.
+\end{enumerate}
+
+These recommendations are intentionally conservative. We do not ask benchmark
+authors to redesign their official metric. We ask evaluators to stop hiding
+existing official structure behind one number.
+
+\subsection{Limitations}
+
+The paper has clear limits. First, the main evidence is local-run rather than a
+synchronized scrape of the public \gittaskbench leaderboard. Second, broader
+frontier API coverage currently exists only on the two-task shared
+\texttt{Trafilatura} slice, where we keep the latest local run per model-task
+pair rather than a synchronized same-day rerun. Third, some
+\processmetric$=$False mass may still reflect local harness brittleness rather
+than pure model weakness. Some \processmetric$=$True,
+\resultmetric$=$False rows also include evaluation-side errors rather than pure
+threshold misses. For these reasons, we present the paper as a measurement note,
+not as a universal scaling law.
+
+\subsection{How This Connects to Richer Agent Analysis}
+
+The result here is deliberately simpler than full trajectory analysis. Recent
+work such as \texttt{AgentRx} and \texttt{TRAJEVAL} asks why an agent failed at a
+fine-grained trajectory level \cite{agentrx,trajeval}. Our claim comes earlier
+in the analysis pipeline. Before manual trajectory diagnosis, the official
+benchmark outputs already justify more structured reporting. That makes the
+\processmetric/\resultmetric split a useful bridge: richer trajectory work can
+build on it, but we should not ignore the information already provided by the
+benchmark.

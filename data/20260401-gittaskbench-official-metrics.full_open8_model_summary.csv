@@ -1,0 +1,9 @@
+model,total_tasks,official_process_true,official_process_rate,official_result_true,official_result_rate,process_true_result_false_count,families_with_official_result
+Qwen2.5-14B-Instruct,54,9,0.1667,5,0.0926,4,Eparse;Faker;PDFPlumber
+Qwen2.5-32B-Instruct,54,7,0.1296,5,0.0926,2,Eparse;Faker;PDFPlumber;SpeechBrain
+Qwen__Qwen2.5-7B-Instruct,54,0,0.0,0,0.0,0,
+Qwen__Qwen3-14B,54,6,0.1111,4,0.0741,2,Eparse;Faker
+Qwen__Qwen3-32B,54,8,0.1481,5,0.0926,3,Faker;PDFPlumber;SpeechBrain;Trafilatura
+deepseek-ai__DeepSeek-R1-Distill-Llama-8B,54,0,0.0,0,0.0,0,
+mistralai__Mistral-7B-Instruct-v0.2,54,0,0.0,0,0.0,0,
+mistralai__Mistral-Small-3.1-24B-Instruct-2503,54,2,0.037,2,0.037,0,Eparse;Trafilatura

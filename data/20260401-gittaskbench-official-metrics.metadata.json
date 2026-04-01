@@ -1,0 +1,51 @@
+{
+  "generated_at_utc": "2026-04-01T16:44:38Z",
+  "run_root": "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/agent_law_gittaskbench_runs",
+  "cohorts": {
+    "full_open8_v4": {
+      "manifest_glob": "20260401-open8gpu-fullbench-v4-gpu*/run_manifest.json",
+      "manifests": [
+        "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-open8gpu-fullbench-v4-gpu00/run_manifest.json",
+        "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-open8gpu-fullbench-v4-gpu01/run_manifest.json",
+        "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-open8gpu-fullbench-v4-gpu02/run_manifest.json",
+        "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-open8gpu-fullbench-v4-gpu03/run_manifest.json",
+        "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-open8gpu-fullbench-v4-gpu04/run_manifest.json",
+        "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-open8gpu-fullbench-v4-gpu05/run_manifest.json",
+        "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-open8gpu-fullbench-v4-gpu06/run_manifest.json",
+        "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-open8gpu-fullbench-v4-gpu07/run_manifest.json"
+      ],
+      "rows": 432,
+      "models": 8,
+      "tasks": 54
+    },
+    "shared_trafilatura_latest": {
+      "tasks": [
+        "Trafilatura_01",
+        "Trafilatura_02"
+      ],
+      "manifests": [
+        "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/agent_law_gittaskbench_runs/20260331-gemini25-trafilatura-v3/run_manifest.json",
+        "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/agent_law_gittaskbench_runs/20260331-gpt52-trafilatura-screen-v3/run_manifest.json",
+        "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/agent_law_gittaskbench_runs/20260331-gpt52-trafilatura-task1-v5/run_manifest.json",
+        "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-open8gpu-fullbench-v4-gpu00/run_manifest.json",
+        "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-open8gpu-fullbench-v4-gpu02/run_manifest.json",
+        "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-open8gpu-fullbench-v4-gpu03/run_manifest.json",
+        "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-open8gpu-fullbench-v4-gpu04/run_manifest.json",
+        "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-open8gpu-fullbench-v4-gpu05/run_manifest.json",
+        "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-open8gpu-fullbench-v4-gpu06/run_manifest.json",
+        "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-open8gpu-fullbench-v4-gpu07/run_manifest.json",
+        "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-qwen25-14b-trafilatura-smoke2/run_manifest.json",
+        "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-qwen25-14b-trafilatura01-smoke/run_manifest.json"
+      ],
+      "rows": 20,
+      "models": 10
+    }
+  },
+  "artifacts": {
+    "full_open8_rows_csv": "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/20260401-gittaskbench-official-metrics.full_open8_rows.csv",
+    "full_open8_model_summary_csv": "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/20260401-gittaskbench-official-metrics.full_open8_model_summary.csv",
+    "full_open8_family_summary_csv": "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/20260401-gittaskbench-official-metrics.full_open8_family_summary.csv",
+    "full_open8_process_true_result_false_csv": "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/20260401-gittaskbench-official-metrics.full_open8_process_true_result_false.csv",
+    "shared_trafilatura_latest_csv": "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/20260401-gittaskbench-official-metrics.shared_trafilatura_latest.csv"
+  }
+}

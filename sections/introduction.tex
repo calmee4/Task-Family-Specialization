@@ -1,0 +1,73 @@
+\section{Introduction}
+
+Agent evaluation is quickly moving beyond single-turn QA into web navigation,
+mobile environments, software engineering, and repository-grounded tool use
+\cite{agentbench,webarena,visualwebarena,androidworld,swebench,swelancer,ambigswe,longsoftwaretasks,gittaskbench,toolgym,deepresearchbench,mcpbench,mcpuniverse}.
+This shift is healthy: real agent deployments are rarely pure language tasks.
+They require interacting with interfaces, repositories, and heterogeneous tools
+while producing structured outputs that can be checked automatically.
+
+At the same time, the dominant reporting habit has remained simple. A model is
+usually assigned one benchmark score, often one success rate, and the result is
+read as an intrinsic capability measure. Recent work has already pushed back on
+that simplification from several angles. Trajectory-oriented analysis argues
+that final success hides diagnostically important execution structure
+\cite{agentrx,trajeval}. Measurement work on long-context and benchmark scaling
+argues that aggregate scores can conceal important task-specific variation
+\cite{lostmiddle,longbench,ruler,infinitebench,nolima,loogle,illusiondiminishingreturns}.
+Multimodal evaluation further shows that answer channel, extraction quality, and
+benchmark family can all matter for what a score actually means
+\cite{mme,mmmu,mathvista,hallusionbench,blink}. These critiques point in the
+same direction: one reported score can hide multiple latent conditions of
+success.
+
+This paper studies a narrow version of that problem in \gittaskbench. We do not
+introduce a new benchmark, a new judge, or a new task metric. We only reuse the
+benchmark's official outputs. \gittaskbench separates \processmetric from
+\resultmetric. The former marks traces that reach grading with an output
+artifact. The latter marks traces whose recorded artifact satisfies the official
+task criterion. Some traces never reach grading; others reach grading but still
+fail. If both cases are collapsed into a single final success rate, important
+structure disappears.
+
+Our study is intentionally conservative. The main cohort is a local comparable
+open-model sweep: $8$ models, $54$ tasks, and $432$ model-task traces. We then
+add a smaller \texttt{Trafilatura\_01/02} slice that extends coverage to $10$
+locally available models, including \texttt{gpt-5.2} and
+\texttt{Gemini-2.5-Pro}. For that slice, we keep the latest local run per
+model-task pair. All plots and tables aggregate only the benchmark's official
+\processmetric and \resultmetric outputs. Derived rates and heatmaps are marked
+as paper-side summaries rather than as new benchmark metrics.
+
+Three findings motivate the paper. First, official success is narrow and
+domain-skewed. In the open-8 cohort, all observed \resultmetric mass lies in
+office, security, web, and speech families; image and video families are
+complete zeros. Second, tied headline totals hide family specialization. Three
+Qwen models each reach $5/54$ official \resultmetric success, but they succeed
+on different tasks and families. Third, \processmetric$=$True,
+\resultmetric$=$False rows are not random residue. They cluster in structured
+extraction families and mix threshold misses, parser failures, and
+evaluation-side errors after grading begins.
+
+The paper's claim is therefore narrower than ``leaderboards are wrong'' and
+narrower than a general law about agent evaluation. Our supported claim is
+simple. On a reproducible local \gittaskbench cohort, reporting only a single
+global \resultmetric rate hides family-specific competence and a structured
+\processmetric$=$True, \resultmetric$=$False regime already visible in the
+benchmark's own outputs.
+
+\paragraph{Contributions.}
+This paper makes four bounded contributions.
+\begin{enumerate}[leftmargin=1.25em]
+\item We construct a traceable official-metric audit of \gittaskbench over a
+comparable open-8 cohort and a broader shared-task slice, while keeping the
+benchmark's official \processmetric/\resultmetric contract fixed.
+\item We show that official \resultmetric success is highly concentrated in a
+small subset of domains and families rather than being smoothly distributed
+across the benchmark.
+\item We show that tied global \resultmetric totals hide material
+task-family specialization across models.
+\item We identify an official \processmetric$=$True, \resultmetric$=$False
+regime that clusters in structured extraction families and should be reported
+explicitly in future repo-grounded evaluations.
+\end{enumerate}

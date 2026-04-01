@@ -1,0 +1,46 @@
+\section{Related Work}
+
+\paragraph{Agent benchmarks across environments.}
+Modern agent evaluation now spans general task suites, web interaction, mobile
+control, software engineering, and tool use
+\cite{agentbench,webarena,visualwebarena,androidworld,toolgym,deepresearchbench,mcpbench,mcpuniverse}.
+Repository-grounded software tasks are especially relevant for our setting
+because they require understanding fixed external codebases rather than solving
+pure language problems in-context. \gittaskbench joins a growing ecosystem that
+includes \texttt{SWE-bench}, \texttt{SWE-Lancer}, \texttt{Ambig-SWE}, and long
+software-task evaluations \cite{swebench,swelancer,ambigswe,longsoftwaretasks}.
+Our paper does not compete with these benchmarks. It studies how one such
+benchmark should be reported once official outputs have already been produced.
+
+\paragraph{Trajectory diagnosis and post-hoc analysis.}
+Several recent works argue that final success alone is insufficient for
+understanding agent behavior. \texttt{AgentRx} diagnoses agent failures from
+execution trajectories, while \texttt{TRAJEVAL} decomposes code-agent traces
+into more granular failure modes \cite{agentrx,trajeval}. Those works motivate a
+general diagnostic mindset. Our contribution is narrower: even before manual
+trajectory analysis, the benchmark's own official \processmetric/\resultmetric
+split already reveals useful structure.
+
+\paragraph{Measurement blind spots in long-context evaluation.}
+Long-context work has repeatedly shown that aggregate scores can hide meaningful
+failure structure. Relevant examples include middle-position forgetting,
+benchmark family variation, and evaluation beyond literal matching
+\cite{lostmiddle,longbench,ruler,infinitebench,nolima,loogle}. We cite this
+literature not because \gittaskbench is a long-context benchmark, but because it
+establishes a broader measurement lesson: when a benchmark score collapses
+multiple conditions of success, reporting only the aggregate can be misleading.
+
+\paragraph{Multimodal benchmarking and answer-channel sensitivity.}
+Multimodal evaluation has also highlighted that benchmark outcomes depend on
+what is being measured and how answers are extracted or judged. Representative
+examples include \texttt{MME}, \texttt{MMMU}, \texttt{MathVista},
+\texttt{HallusionBench}, and \texttt{BLINK} \cite{mme,mmmu,mathvista,hallusionbench,blink}.
+The connection to our work is again methodological. Structured outputs,
+thresholded criteria, and answer-channel validity matter in multimodal
+benchmarks; they also matter in repository-grounded software tasks.
+
+\paragraph{Positioning.}
+This paper is best read as a measurement note on repo-grounded agent evaluation.
+It does not propose a new benchmark or a new official metric. It instead argues
+that \gittaskbench's existing official metrics already support more informative
+reporting than a single global pass rate.

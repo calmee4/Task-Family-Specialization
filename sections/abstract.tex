@@ -1,0 +1,23 @@
+Agent benchmarks are often summarized with a single success rate per model, but
+repository-grounded tasks already expose a richer official distinction between
+reaching the benchmark's grading stage and actually satisfying the task
+criterion. We study that distinction in \gittaskbench using only the
+benchmark's official \processmetric/\resultmetric outputs. Our main cohort is a
+comparable local open-model sweep covering $8$ models, $54$ tasks, and $432$
+model-task traces. We add a broader shared-task slice on
+\texttt{Trafilatura\_01/02} that extends coverage to $10$ locally available
+models, including \texttt{gpt-5.2} and \texttt{Gemini-2.5-Pro}. Three empirical
+patterns emerge. First,
+official \resultmetric success is narrow and domain-skewed: in the open-8
+cohort, all observed \resultmetric mass lies in office, security, web, and
+speech families, while image and video families are complete zeros. Second,
+tied headline scores hide family-specific competence: three Qwen models all
+reach $5/54$ official \resultmetric success, but they do so on materially
+different task families. Third, official \processmetric$=$True,
+\resultmetric$=$False rows are not uniformly distributed; they cluster in
+structured extraction families such as \texttt{Eparse}, \texttt{PDFPlumber},
+\texttt{Scrapy}, and \texttt{NeuroKit}. These findings support a narrow
+measurement claim rather than a new benchmark or a new metric:
+repo-grounded agent evaluation should report the benchmark's official
+\processmetric/\resultmetric split and family-level slices, not only a single
+global pass rate.
