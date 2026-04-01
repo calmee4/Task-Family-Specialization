@@ -19,6 +19,65 @@ These recommendations are intentionally conservative. We do not ask benchmark
 authors to redesign their official metric. We ask evaluators to stop hiding
 existing official structure behind one number.
 
+\subsection{A Minimal Reporting Standard}
+
+The paper's practical recommendation can be made more concrete. A minimal
+repo-grounded benchmark table should contain at least four pieces of
+information. First, one row of global official totals remains useful, because it
+provides a compact benchmark headline. Second, the same table or a companion
+figure should report family or domain slices, so the reader can see where the
+success mass actually lands. Third, the paper should expose at least a small
+sample of official \processmetric$=$True, \resultmetric$=$False comments from
+the families that dominate that regime. Fourth, any supplementary slice, such as
+our provider screen, should be labeled explicitly as a targeted robustness check
+rather than silently merged into the main benchmark cohort.
+
+This standard is intentionally lightweight. It does not require trajectory
+annotation, human judges, or new benchmark infrastructure. It only requires
+authors to preserve and report structure that the benchmark already emits. That
+is why we view the proposal as realistic. It is closer to better bookkeeping
+than to a new evaluation methodology.
+
+\subsection{Providers Are Not One Control Condition}
+
+The supplementary provider screen adds one more practical lesson. Papers often
+use one strong provider model as a qualitative control and then discuss ``closed
+models'' as if they formed one stable reference class. Our local evidence does
+not support that shortcut. On the same $14$ official tasks, \texttt{gpt-5-chat},
+\texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro} occupy very different parts of the
+\processmetric/\resultmetric space. This does not prove a frontier ranking, but
+it does show that provider breadth matters even for a conservative measurement
+note. One provider model can light up \texttt{Scrapy} or \texttt{NeuroKit}
+while another barely reaches grading outside \texttt{PDFPlumber}.
+
+That observation interacts directly with how open-model comparisons are read.
+When an open-model cohort records zero official \resultmetric success on some
+family, the next question should not be ``can one cherry-picked provider model
+solve it?'' The more useful question is whether the family activates
+consistently across a broader model class. In our local evidence,
+\texttt{NeuroKit} and \texttt{Scrapy} move under both GPT-family models, while
+image and video stressors stay dark even after the provider expansion. This is
+exactly why we recommend reporting family slices rather than only one total or
+one anecdotal frontier run.
+
+\subsection{Why This Matters For Future Agent Papers}
+
+Many future agent papers will not present a new benchmark. They will present a
+new scaffold, a new planning module, a new retrieval policy, or a new model
+family on an existing benchmark. In that setting, reporting only one final
+success rate creates a strong temptation to over-read small improvements. An
+apparent gain may come from improving just one structured family, from making
+more traces gradeable without improving their final correctness, or from moving
+one domain while leaving other domains unchanged.
+
+Our measurement note does not resolve those ambiguities. It makes them visible.
+That is the right scope for the current evidence. The benchmark already tells us
+more than most papers currently report, and that extra information becomes more
+important as agent papers become more incremental. Once multiple papers begin to
+cluster around small absolute gains, family-level slices and the
+\processmetric/\resultmetric split will be necessary for knowing whether two
+systems improved in the same way at all.
+
 \subsection{Limitations}
 
 The paper has clear limits. First, the main evidence is local-run rather than a

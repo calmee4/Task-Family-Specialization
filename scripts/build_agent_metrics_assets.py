@@ -16,6 +16,11 @@ TABLES = ROOT / "tables"
 MODEL_CSV = DATA / "20260401-gittaskbench-official-metrics.full_open8_model_summary.csv"
 ROWS_CSV = DATA / "20260401-gittaskbench-official-metrics.full_open8_rows.csv"
 SHARED_CSV = DATA / "20260401-gittaskbench-official-metrics.shared_trafilatura_latest.csv"
+PROVIDER14_ROWS_CSV = DATA / "20260401-gittaskbench-provider14-official-metrics.rows.csv"
+PROVIDER14_MODEL_CSV = DATA / "20260401-gittaskbench-provider14-official-metrics.model_summary.csv"
+PROVIDER14_ROWS_FALLBACK_CSV = DATA / "20260401-gittaskbench-provider14-partial-official-metrics.rows.csv"
+PROVIDER14_MODEL_FALLBACK_CSV = DATA / "20260401-gittaskbench-provider14-partial-official-metrics.model_summary.csv"
+PROVIDER54_ROWS_CSV = DATA / "20260401-gpt5chat-full54-official-metrics.rows.csv"
 
 FAMILY_TO_DOMAIN = {
     "AnimeGANv3": "Image",
@@ -49,6 +54,7 @@ PRETTY_MODEL = {
     "deepseek-ai__DeepSeek-R1-Distill-Llama-8B": "DeepSeek-R1-D8B",
     "mistralai__Mistral-7B-Instruct-v0.2": "Mistral-7B",
     "mistralai__Mistral-Small-3.1-24B-Instruct-2503": "Mistral-Small-24B",
+    "gpt-5-chat-2025-08-07": "gpt-5-chat",
     "gpt-5.2-2025-12-11": "gpt-5.2",
     "gemini-2.5-pro-preview-06-05": "Gemini-2.5-Pro",
 }
@@ -57,6 +63,14 @@ PRETTY_MODEL = {
 def read_csv(path):
     with path.open(newline="", encoding="utf-8") as handle:
         return list(csv.DictReader(handle))
+
+
+def read_optional_csv(primary, fallback=None):
+    if primary.exists():
+        return read_csv(primary)
+    if fallback is not None and fallback.exists():
+        return read_csv(fallback)
+    return []
 
 
 def escape_tex(text):
@@ -163,6 +177,77 @@ def build_shared_table(rows):
         lines.append(f"{escape_tex(pretty_model(model))} & {t1} & {t2} \\\\")
     lines.extend(["\\bottomrule", "\\end{tabular}", "\\end{table}", ""])
     write(TABLES / "shared_trafilatura.tex", "\n".join(lines))
+
+
+def build_provider_screen_table(model_rows):
+    if not model_rows:
+        return
+    rows = sorted(
+        model_rows,
+        key=lambda row: (
+            -int(row["official_result_true"]),
+            -int(row["official_process_true"]),
+            pretty_model(row["model"]),
+        ),
+    )
+
+    lines = [
+        "\\begin{table}[t]",
+        "\\caption{Supplementary provider screen on 14 selected tasks. Counts are official GitTaskBench outcomes and are reported separately from the comparable open-8 cohort.}",
+        "\\label{tab:provider-screen}",
+        "\\centering",
+        "\\small",
+        "\\begin{tabular}{p{0.18\\columnwidth}ccp{0.42\\columnwidth}}",
+        "\\toprule",
+        "Model & Process & Result & Families with Result \\\\",
+        "\\midrule",
+    ]
+    for row in rows:
+        lines.append(
+            f'{escape_tex(pretty_model(row["model"]))} & '
+            f'{row["official_process_true"]}/14 & '
+            f'{row["official_result_true"]}/14 & '
+            f'{escape_tex(row["families_with_official_result"] or "--")} \\\\'
+        )
+    lines.extend([
+        "\\bottomrule",
+        "\\end{tabular}",
+        "\\end{table}",
+        "",
+    ])
+    write(TABLES / "provider_screen.tex", "\n".join(lines))
+
+
+def build_provider_full54_domain_table(rows):
+    if not rows:
+        return
+    stats = defaultdict(lambda: {"total": 0, "process": 0, "result": 0})
+    for row in rows:
+        domain = FAMILY_TO_DOMAIN[row["family"]]
+        stats[domain]["total"] += 1
+        stats[domain]["process"] += int(row["official_process"] == "True")
+        stats[domain]["result"] += int(row["official_result"] == "True")
+
+    lines = [
+        "\\begin{table}[t]",
+        "\\caption{Supplementary full-54 \\texttt{gpt-5-chat} run summarized by domain. Counts are paper-side aggregates over official per-task GitTaskBench outputs.}",
+        "\\label{tab:provider-full54-domain}",
+        "\\centering",
+        "\\small",
+        "\\begin{tabular}{lrrr}",
+        "\\toprule",
+        "Domain & Total & Process & Result \\\\",
+        "\\midrule",
+    ]
+    for domain in DOMAIN_ORDER:
+        item = stats[domain]
+        if item["total"] == 0:
+            continue
+        lines.append(
+            f'{domain} & {item["total"]} & {item["process"]} & {item["result"]} \\\\'
+        )
+    lines.extend(["\\bottomrule", "\\end{tabular}", "\\end{table}", ""])
+    write(TABLES / "provider_full54_domain.tex", "\n".join(lines))
 
 
 def plot_model_summary(rows):
@@ -282,10 +367,15 @@ def main():
     model_rows = read_csv(MODEL_CSV)
     row_records = read_csv(ROWS_CSV)
     shared_rows = read_csv(SHARED_CSV)
+    provider_rows = read_optional_csv(PROVIDER14_ROWS_CSV, PROVIDER14_ROWS_FALLBACK_CSV)
+    provider_model_rows = read_optional_csv(PROVIDER14_MODEL_CSV, PROVIDER14_MODEL_FALLBACK_CSV)
+    provider54_rows = read_optional_csv(PROVIDER54_ROWS_CSV)
 
     build_model_summary_table(model_rows)
     build_domain_table(row_records)
     build_shared_table(shared_rows)
+    build_provider_screen_table(provider_model_rows)
+    build_provider_full54_domain_table(provider54_rows)
     plot_model_summary(model_rows)
     plot_domain_summary(row_records)
     plot_task_heatmap(row_records)

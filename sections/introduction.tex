@@ -34,17 +34,23 @@ Our study is intentionally conservative. The main cohort is a local comparable
 open-model sweep: $8$ models, $54$ tasks, and $432$ model-task traces. We then
 add a smaller \texttt{Trafilatura\_01/02} slice that extends coverage to $10$
 locally available models, including \texttt{gpt-5.2} and
-\texttt{Gemini-2.5-Pro}. For that slice, we keep the latest local run per
-model-task pair. All plots and tables aggregate only the benchmark's official
-\processmetric and \resultmetric outputs. Derived rates and heatmaps are marked
-as paper-side summaries rather than as new benchmark metrics.
+\texttt{Gemini-2.5-Pro}. We also add a targeted $14$-task provider screen on
+\texttt{gpt-5-chat}, \texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro} so the paper
+does not reduce to a purely within-open-model comparison. For the shared-task
+slice, we keep the latest local run per model-task pair. All plots and tables
+aggregate only the benchmark's official \processmetric and \resultmetric
+outputs. Derived rates and heatmaps are marked as paper-side summaries rather
+than as new benchmark metrics.
 
 Three findings motivate the paper. First, official success is narrow and
 domain-skewed. In the open-8 cohort, all observed \resultmetric mass lies in
 office, security, web, and speech families; image and video families are
 complete zeros. Second, tied headline totals hide family specialization. Three
 Qwen models each reach $5/54$ official \resultmetric success, but they succeed
-on different tasks and families. Third, \processmetric$=$True,
+on different tasks and families. The targeted provider screen adds a second
+measurement point: broader frontier coverage changes which families activate,
+but provider models are themselves highly non-uniform on the same official
+tasks. Third, \processmetric$=$True,
 \resultmetric$=$False rows are not random residue. They cluster in structured
 extraction families and mix threshold misses, parser failures, and
 evaluation-side errors after grading begins.

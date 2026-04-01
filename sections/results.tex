@@ -14,6 +14,7 @@ and speech contributes $2/64$. Physiological signals show two
 complete zeros.
 
 \input{tables/model_summary}
+\input{tables/domain_summary}
 
 \begin{figure*}[t]
     \centering
@@ -36,6 +37,22 @@ This distribution matters because a single global score can suggest a smooth
 ordering that the domain slices do not support. In our cohort, different
 families occupy different parts of the official \processmetric/\resultmetric
 space, and some families currently produce no observed official success at all.
+Table~\ref{tab:domain-summary} makes the imbalance explicit. Office and security
+do not merely have higher absolute success counts; they also occupy most of the
+observed \processmetric-true mass. By contrast, image and video are complete
+zeros under both official fields in this cohort. This means a single benchmark
+score can blur together at least three qualitatively different states: domains
+with repeatable task completion, domains with gradeable-but-unsuccessful traces,
+and domains with no observed official traction at all.
+
+This point becomes stronger once we separate benchmark mass from success mass.
+Image tasks constitute the single largest domain block in the open-8 cohort, but
+they contribute nothing to observed official success. Office and security are
+much smaller by trace count than image plus video combined, yet they account for
+nearly all observed \resultmetric success. A single total like ``$5/54$'' cannot
+tell the reader whether a model is weak everywhere, strong only on structured
+extraction, or simply facing a benchmark where most active success mass lives in
+just a few families.
 
 \subsection{Tied Headline Scores Hide Family Specialization}
 
@@ -63,6 +80,15 @@ hide material specialization even before we look at trajectories, prompts, or
 manual annotations. If the reporting goal is to understand what a repo-grounded
 agent can actually do, the family slice matters.
 
+It also matters for how we read ties. A tie at $5/54$ is easy to over-interpret
+as evidence that the three models are functionally interchangeable. The task
+heatmap shows that they are not. One model's official success budget is spent on
+\texttt{Eparse}; another's is spent on \texttt{Trafilatura}; another picks up
+\texttt{SpeechBrain}. These are not cosmetic differences. They imply different
+failure surfaces, different benchmark coverage, and different places where a
+future method paper might appear to ``improve the agent'' simply by improving
+one narrow family.
+
 \subsection{The Local Evidence Already Extends Beyond Qwen}
 
 The open-8 comparable cohort contains only one non-Qwen model with non-zero
@@ -84,6 +110,60 @@ we do not claim a stable frontier ranking. The supported claim is narrower:
 once the same official tasks are aligned, official non-Qwen successes already
 appear in local evidence.
 
+\subsection{A Supplementary Provider Screen Changes The Active Families}
+
+The shared \texttt{Trafilatura} slice broadens coverage across models but only on
+two tasks. To test whether the family picture changes on a slightly wider slice,
+we complete the same targeted $14$-task screen for three provider models:
+\texttt{gpt-5-chat}, \texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro}. The task set
+includes office, security, speech, web, physiological-signal, image, and video
+tasks, and it is scored only with official \processmetric/\resultmetric
+outputs.
+
+\input{tables/provider_screen}
+
+The resulting spread is already substantial. \texttt{gpt-5-chat} reaches
+official \processmetric$=11/14$ and \resultmetric$=9/14$ across seven
+families. \texttt{gpt-5.2} reaches \processmetric$=10/14$ and
+\resultmetric$=7/14$ across six families. \texttt{Gemini-2.5-Pro} reaches only
+\processmetric$=1/14$ and \resultmetric$=1/14$, both on
+\texttt{PDFPlumber\_01}. The provider screen therefore broadens the evidence
+base, but it does not behave like a single homogeneous ``closed-model'' control
+condition.
+
+The family pattern is more informative than the totals. Both GPT-family models
+convert \texttt{Scrapy\_03} and \texttt{NeuroKit\_01} into official
+\resultmetric success, whereas the open-8 cohort had no official
+\resultmetric-positive rows at all in \texttt{Scrapy} or \texttt{NeuroKit}.
+\texttt{gpt-5-chat} additionally reaches official success on
+\texttt{SpeechBrain\_05}; \texttt{gpt-5.2} does not. \texttt{Gemini-2.5-Pro},
+by contrast, activates only \texttt{PDFPlumber}. This is exactly the kind of
+structure that a single global pass rate would obscure. If we reported only one
+provider total, we would hide the fact that ``provider strength'' is itself
+family-selective in local evidence.
+
+The provider screen also changes how we should read the open-8 zeros. A zero in
+the open-8 cohort need not mean the family is inherently impossible under the
+benchmark's official metric. \texttt{NeuroKit} and \texttt{Scrapy} illustrate
+this clearly. In the open-8 cohort they contribute only to the
+\processmetric$=$True, \resultmetric$=$False regime or to complete failure. In
+the provider screen they become official \resultmetric-positive families for
+both GPT-family models. By contrast, the image and video stressors,
+\texttt{AnimeGANv3\_01} and \texttt{VideoPose3D\_01}, remain
+\processmetric$=$False for all three provider models. That difference is
+important: some zeros are family-specific capability gaps that move with model
+class, while others look more like benchmark-wide dead zones under the current
+agent setup.
+
+The screen also shows that stronger totals do not eliminate the intermediate
+\processmetric$=$True, \resultmetric$=$False regime. Both \texttt{gpt-5-chat}
+and \texttt{gpt-5.2} still spend mass there on \texttt{PDFPlumber\_02} and
+\texttt{Trafilatura\_01}. \texttt{gpt-5.2} additionally lands in that regime on
+\texttt{PDFPlumber\_01}. This matters for interpretation. The stronger provider
+models are not simply converting every non-success into clean official success;
+they are redistributing failures across the benchmark's existing official
+states.
+
 \subsection{The \processmetric$=$True, \resultmetric$=$False Regime Clusters}
 
 The open-8 cohort contains $11$ rows with official \processmetric$=$True and
@@ -97,8 +177,35 @@ $75\%$ cell-level threshold, e.g., $64.92\%$ for
 reports XML parsing failure. On \texttt{Eparse\_03}, one official comment
 reports an evaluation-side error after grading begins.
 
+\input{tables/process_gap_examples}
+
 We therefore do not interpret every \processmetric$=$True,
 \resultmetric$=$False row as the same failure mode. The narrower point is that
 collapsing these rows into generic total failure erases a benchmark-visible
 intermediate regime. That regime is already concentrated enough to reveal where
-additional reporting detail is most needed.
+additional reporting detail is most needed. Table~\ref{tab:process-gap-examples}
+shows four representative cases from different families. Two patterns are
+especially important. First, not all graded-but-unsuccessful rows are equal:
+some are close threshold misses such as \texttt{PDFPlumber\_02}, while others
+are schema or parser breakdowns. Second, official comments already separate
+these cases without any new judge or taxonomy. That makes the regime useful for
+benchmark reporting even before richer trajectory-level diagnosis.
+
+This intermediate regime is also where future benchmark analysis can gain the
+most leverage. A method paper that converts \texttt{PDFPlumber\_02} from
+\processmetric$=$True, \resultmetric$=$False into full success is doing
+something different from a method paper that merely converts
+\processmetric$=$False into \processmetric$=$True on image tasks. Both changes
+may help the final success rate, but they act on different parts of the failure
+surface. Reporting only one global number prevents that distinction.
+
+\subsection{Interpreting The Measurement Claim}
+
+The combined picture is now sharper. Global official totals remain useful for a
+headline snapshot, but they are too lossy to stand alone. Domain slices show
+where success mass is concentrated. Task-level heatmaps show that tied totals do
+not imply the same competence profile. The graded-but-unsuccessful regime shows
+that even within failure, some traces are substantially more informative than
+others. These are modest claims, but they are operationally important. A paper
+that reports only one \resultmetric total discards benchmark-visible structure
+that already exists in official outputs.
