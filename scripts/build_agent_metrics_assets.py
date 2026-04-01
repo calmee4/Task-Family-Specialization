@@ -98,7 +98,11 @@ def pretty_model(name):
 def format_family_list(text):
     if not text:
         return "--"
-    return escape_tex(text.replace(";", ", "))
+    parts = [escape_tex(part.strip()) for part in text.split(";") if part.strip()]
+    if len(parts) <= 3:
+        return ", ".join(parts)
+    lines = [", ".join(parts[idx:idx + 3]) for idx in range(0, len(parts), 3)]
+    return "\\shortstack[l]{" + "\\\\ ".join(lines) + "}"
 
 
 def build_model_summary_table(rows):
@@ -209,7 +213,8 @@ def build_provider_screen_table(model_rows):
         "\\label{tab:provider-screen}",
         "\\centering",
         "\\small",
-        "\\begin{tabular}{p{0.18\\columnwidth}ccp{0.50\\columnwidth}}",
+        "\\setlength{\\tabcolsep}{3.5pt}",
+        "\\begin{tabular}{@{}p{0.17\\columnwidth}ccp{0.47\\columnwidth}@{}}",
         "\\toprule",
         "\\rowcolor{blue!12}",
         "Model & Process & Result & Families with Result \\\\",
@@ -226,6 +231,7 @@ def build_provider_screen_table(model_rows):
     lines.extend([
         "\\bottomrule",
         "\\end{tabular}",
+        "\\setlength{\\tabcolsep}{6pt}",
         "\\end{table}",
         "",
     ])

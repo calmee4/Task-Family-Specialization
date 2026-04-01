@@ -3,15 +3,17 @@
 \label{tab:provider-screen}
 \centering
 \small
-\begin{tabular}{p{0.18\columnwidth}ccp{0.50\columnwidth}}
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{@{}p{0.17\columnwidth}ccp{0.47\columnwidth}@{}}
 \toprule
 \rowcolor{blue!12}
 Model & Process & Result & Families with Result \\
 \midrule
 \rowcolors{2}{blue!4}{white}
-gpt-5-chat & 11 & 9 & Eparse, Faker, NeuroKit, PDFPlumber, Scrapy, SpeechBrain, Trafilatura \\
-gpt-5.2 & 10 & 7 & Eparse, Faker, NeuroKit, PDFPlumber, Scrapy, Trafilatura \\
+gpt-5-chat & 11 & 9 & \shortstack[l]{Eparse, Faker, NeuroKit\\ PDFPlumber, Scrapy, SpeechBrain\\ Trafilatura} \\
+gpt-5.2 & 10 & 7 & \shortstack[l]{Eparse, Faker, NeuroKit\\ PDFPlumber, Scrapy, Trafilatura} \\
 Gemini-2.5-Pro & 1 & 1 & PDFPlumber \\
 \bottomrule
 \end{tabular}
+\setlength{\tabcolsep}{6pt}
 \end{table}
