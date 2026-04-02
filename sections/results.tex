@@ -164,40 +164,43 @@ models are not simply converting every non-success into clean official success;
 they are redistributing failures across the benchmark's existing official
 states.
 
-\subsection{A Full-Benchmark Provider Run Shows The Screen Is Not Enough}
+\subsection{Full-Benchmark Provider Sweeps Show The Screen Is Not Enough}
 
 The targeted provider screen is useful for broadening model coverage, but it is
-still a targeted slice. To test how far that slice extrapolates, we run
-\texttt{gpt-5-chat} on the full benchmark. Table~\ref{tab:provider-full54-domain}
-shows that the resulting successes are again strongly concentrated. Office, web,
-and security dominate the successful domains. By contrast, speech remains dark,
-physiological signals stay in the graded-but-unsuccessful regime, image only
-activates narrowly, and video stays dark.
+still a targeted slice. To test how far that slice extrapolates, we complete
+full-benchmark sweeps for \texttt{gpt-5-chat}, \texttt{gpt-5.2}, and
+\texttt{Gemini-2.5-Pro}. Table~\ref{tab:provider-full54-summary} summarizes the
+resulting official totals and the families that actually reach official
+\resultmetric success.
 
-\input{tables/provider_full54_domain}
+\input{tables/provider_full54_summary}
 
-The family breakdown explains why the full sweep is more informative than the
-screen alone. Several screen-positive families remain robust when the full
-family is restored: \texttt{PDFPlumber}, \texttt{PyPDF2}, \texttt{Scrapy}, and
-\texttt{Faker} are all perfect official-success families for
-\texttt{gpt-5-chat} on this run, and \texttt{Trafilatura} retains one official
-success on \texttt{Trafilatura\_03}. But other screen positives do not
-generalize uniformly. \texttt{NeuroKit\_01} was an official success in the
-targeted provider screen, yet the full-benchmark run yields
-\processmetric$=$True, \resultmetric$=$False on \texttt{NeuroKit\_01} and
-\texttt{NeuroKit\_02}, followed by a complete failure on
-\texttt{NeuroKit\_03}. The image side remains even narrower: the only official
-\resultmetric-positive image task is \texttt{SuperResolution\_03}; the rest of
-the image/video slice remains unsuccessful.
+The full sweeps show why the short screen is not enough. \texttt{gpt-5.2}
+expands rather than contracts on the full benchmark: it exceeds
+\texttt{gpt-5-chat} on both official fields and activates a much broader family
+footprint, including \texttt{FunASR}, \texttt{InvisibleWatermark},
+\texttt{NeuroKit}, \texttt{SpeechBrain}, \texttt{Stegano},
+\texttt{StyleTransfer}, and \texttt{TransparentBackground}. Some of these
+families are dark or only partially active for \texttt{gpt-5-chat} on the full
+benchmark. \texttt{Gemini-2.5-Pro}, by contrast, contracts to a narrow
+office/security footprint centered on \texttt{Faker} and \texttt{PyPDF2}.
+
+The family-level changes are informative in both directions. The targeted
+screen overstates some activations: \texttt{gpt-5-chat} reaches official
+\resultmetric success on \texttt{SpeechBrain\_05} and \texttt{NeuroKit\_01} in
+the screen, yet speech stays dark and \texttt{NeuroKit} falls back into the
+graded-but-unsuccessful regime once the full family distribution is restored.
+The screen also misses some activations: \texttt{gpt-5.2} picks up full-benchmark
+official success in \texttt{FunASR}, \texttt{Stegano},
+\texttt{StyleTransfer}, and \texttt{TransparentBackground}, while
+\texttt{Gemini-2.5-Pro}'s only full-benchmark official-success families are
+\texttt{Faker} and \texttt{PyPDF2} rather than the screen's single
+\texttt{PDFPlumber} success.
 
 This is the clearest reason not to treat a targeted provider slice as a hidden
-replacement leaderboard. The screen correctly shows that some local zeros are
-not benchmark-wide impossibilities: provider models can light up
-\texttt{Scrapy}, \texttt{NeuroKit}, and broader office families. But the
-full-benchmark provider run shows that family activation and family robustness are
-not the same claim. A short screen can reveal that a family is reachable at
-all, while still overstating how consistently that reachability extends across
-the benchmark's full task distribution.
+replacement leaderboard. A short screen can reveal that a family is reachable
+at all, but only full-benchmark sweeps show whether those activations persist,
+swap across families, or disappear once the full task distribution is restored.
 
 \subsection{The \processmetric$=$True, \resultmetric$=$False Regime Clusters}
 

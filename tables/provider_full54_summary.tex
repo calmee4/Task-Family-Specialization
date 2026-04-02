@@ -1,0 +1,19 @@
+\begin{table}[t]
+\caption{Supplementary full-benchmark provider sweeps under the same local GitTaskBench setup. Listed families contain at least one official \resultmetric$=$True row.}
+\label{tab:provider-full54-summary}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{@{}p{0.17\columnwidth}ccp{0.47\columnwidth}@{}}
+\toprule
+\rowcolor{cyan!12}
+Model & Process & Result & Families with Result \\
+\midrule
+\rowcolors{2}{cyan!4}{white}
+gpt-5.2 & 34 & 28 & \shortstack[l]{Eparse, Faker\\ FunASR, InvisibleWatermark\\ NeuroKit, PDFPlumber\\ PyPDF2, Scrapy\\ SpeechBrain, Stegano\\ StyleTransfer, SuperResolution\\ TransparentBackground} \\
+gpt-5-chat & 21 & 16 & \shortstack[l]{Eparse, Faker\\ PDFPlumber, PyPDF2\\ Scrapy, SuperResolution\\ Trafilatura} \\
+Gemini-2.5-Pro & 3 & 2 & Faker, PyPDF2 \\
+\bottomrule
+\end{tabular}
+\setlength{\tabcolsep}{6pt}
+\end{table}

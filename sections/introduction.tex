@@ -40,13 +40,14 @@ does not reduce to a purely within-open-model comparison. For the shared-task
 slice, we keep the latest local run per model-task pair. All plots and tables
 aggregate only the benchmark's official \processmetric and \resultmetric
 outputs. Derived rates and heatmaps are marked as paper-side summaries rather
-than as new benchmark metrics. Finally, we add one full-benchmark
-\texttt{gpt-5-chat} provider sweep to test whether the targeted screen remains
+than as new benchmark metrics. Finally, we add full-benchmark provider sweeps
+for \texttt{gpt-5-chat}, \texttt{gpt-5.2}, and
+\texttt{Gemini-2.5-Pro} to test whether the targeted screen remains
 representative once the full benchmark distribution is restored.
 
 The evidence hierarchy is intentional. The comparable local cohort is the
 paper's primary evidence. The targeted provider screen and the full-benchmark
-\texttt{gpt-5-chat} run are separate robustness checks, and the shared
+provider sweeps are separate robustness checks, and the shared
 \texttt{Trafilatura} slice is used only as a cross-model existence proof.
 
 Three findings motivate the paper. First, official success is narrow and
@@ -57,9 +58,11 @@ The leading Qwen models tie on official \resultmetric success, but they succeed
 on different tasks and families. The targeted provider screen adds a second
 measurement point: broader frontier coverage changes which families activate,
 but provider models are themselves highly non-uniform on the same official
-tasks. The full-benchmark \texttt{gpt-5-chat} supplement sharpens that point: even a
-much stronger provider run remains concentrated in office, web, and security,
-while speech and almost all image/video families stay dark. Third,
+tasks. The full-benchmark provider sweeps sharpen that point further:
+\texttt{gpt-5.2} expands into additional speech, security, physiological-signal,
+and image families, \texttt{gpt-5-chat} remains concentrated in office, web,
+and security with only a narrow image exception, and
+\texttt{Gemini-2.5-Pro} stays narrow. Third,
 \processmetric$=$True,
 \resultmetric$=$False rows are not random residue. They cluster in structured
 extraction families and mix threshold misses, parser failures, and

@@ -1,0 +1,17 @@
+{
+  "generated_at_utc": "2026-04-02T03:38:54Z",
+  "run_root": "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/agent_law_gittaskbench_runs",
+  "manifest_glob": "20260401-provider-full54-wave-gemini25profull54/run_manifest.json",
+  "manifests": [
+    "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-provider-full54-wave-gemini25profull54/run_manifest.json"
+  ],
+  "rows": 54,
+  "models": 1,
+  "tasks": 54,
+  "artifacts": {
+    "rows_csv": "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/20260401-gemini25pro-full54-official-metrics.rows.csv",
+    "model_summary_csv": "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/20260401-gemini25pro-full54-official-metrics.model_summary.csv",
+    "task_summary_csv": "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/20260401-gemini25pro-full54-official-metrics.task_summary.csv",
+    "process_true_result_false_csv": "/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/20260401-gemini25pro-full54-official-metrics.process_true_result_false.csv"
+  }
+}

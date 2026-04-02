@@ -25,12 +25,16 @@ python3 workspace/_codex/experiments/20260401_gittaskbench_official_metrics_surv
   - `workspace/_codex/experiments/agent_law_gittaskbench_runs/20260331-gpt52-trafilatura-*/run_manifest.json`
   - `workspace/_codex/experiments/agent_law_gittaskbench_runs/20260331-gemini25-trafilatura-v*/run_manifest.json`
 - targeted provider screen:
-  - `workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-provider14-gpt5chat-openrouter/run_manifest.json`
-  - `workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-provider14-gpt52-openrouter/run_manifest.json`
-  - `workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-provider14-gemini25pro-openrouter/run_manifest.json`
+  - `workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-provider14-modelhub-screen-gpt5chat/run_manifest.json`
+  - `workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-provider14-modelhub-screen-gpt52/run_manifest.json`
+  - `workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-provider14-modelhub-screen-gemini25pro/run_manifest.json`
 - full-54 provider supplement:
   - `workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-gpt5chat-full54-modelhub/run_manifest.json`
   - `workspace/_codex/experiments/agent_law_gittaskbench_launches/20260401-gpt5chat-full54-modelhub/gpt5chat.log`
+  - `workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-provider-full54-wave-gpt52full54/run_manifest.json`
+  - `workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-provider-full54-wave-gemini25profull54/run_manifest.json`
+  - `workspace/_codex/experiments/agent_law_gittaskbench_launches/20260401-provider-full54-wave/logs/gpt52full54.log`
+  - `workspace/_codex/experiments/agent_law_gittaskbench_launches/20260401-provider-full54-wave/logs/gemini25profull54.log`
 
 ## Paper-Local Data Copies
 
@@ -49,6 +53,16 @@ python3 workspace/_codex/experiments/20260401_gittaskbench_official_metrics_surv
 - `data/20260401-gpt5chat-full54-official-metrics.rows.csv`
 - `data/20260401-gpt5chat-full54-official-metrics.model_summary.csv`
 - `data/20260401-gpt5chat-full54-official-metrics.task_summary.csv`
+- `data/20260401-gpt52-full54-official-metrics.rows.csv`
+- `data/20260401-gpt52-full54-official-metrics.model_summary.csv`
+- `data/20260401-gpt52-full54-official-metrics.task_summary.csv`
+- `data/20260401-gpt52-full54-official-metrics.process_true_result_false.csv`
+- `data/20260401-gpt52-full54-official-metrics.metadata.json`
+- `data/20260401-gemini25pro-full54-official-metrics.rows.csv`
+- `data/20260401-gemini25pro-full54-official-metrics.model_summary.csv`
+- `data/20260401-gemini25pro-full54-official-metrics.task_summary.csv`
+- `data/20260401-gemini25pro-full54-official-metrics.process_true_result_false.csv`
+- `data/20260401-gemini25pro-full54-official-metrics.metadata.json`
 
 ## Table And Figure Build
 
@@ -67,7 +81,7 @@ Generated assets:
   - `tables/domain_summary.tex`
   - `tables/shared_trafilatura.tex`
   - `tables/provider_screen.tex`
-  - `tables/provider_full54_domain.tex`
+  - `tables/provider_full54_summary.tex`
 
 ## Scope Notes
 
@@ -83,4 +97,6 @@ Generated assets:
 - Those rows are reported separately from the full open-8 cohort.
 - The full-54 provider supplement currently included in the paper is:
   - `gpt-5-chat-2025-08-07`
-- That run is also reported separately from both the full open-8 cohort and the targeted 14-task provider screen.
+  - `gpt-5.2-2025-12-11`
+  - `gemini-2.5-pro-preview-06-05`
+- Those runs are also reported separately from both the full open-8 cohort and the targeted 14-task provider screen.

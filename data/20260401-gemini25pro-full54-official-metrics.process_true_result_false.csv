@@ -1,0 +1,4 @@
+run_id,manifest_path,model,task_id,family,status,official_process,official_result,official_comment,metric_source,grade_result_path,query_path
+20260401-provider-full54-wave-gemini25profull54,/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-provider-full54-wave-gemini25profull54/run_manifest.json,gemini-2.5-pro-preview-06-05,PDFPlumber_02,PDFPlumber,graded_failed,True,False,"✅ Column names and order match.
+Overall cell-by-cell match rate: 64.92% (threshold=75%)
+❌ Test failed!",grade_summary,/mnt/bn/xsc-f1526e9f/yongkang/workspace/_codex/experiments/agent_law_gittaskbench_runs/20260401-provider-full54-wave-gemini25profull54/gemini-2.5-pro-preview-06-05/PDFPlumber_02/grade/PDFPlumber_02/result.jsonl,/mnt/bn/xsc-f1526e9f/yongkang/workspace/external/agent_laws/GitTaskBench/queries/PDFPlumber_02/query.json

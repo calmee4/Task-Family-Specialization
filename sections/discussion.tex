@@ -84,24 +84,27 @@ one anecdotal frontier run.
 
 \subsection{Targeted Screens Need Full-Benchmark Backstops}
 
-The separate \texttt{gpt-5-chat} full-benchmark run adds a second lesson. A
+The separate full-benchmark provider sweeps add a second lesson. A
 targeted screen is good at finding activation points, but it can be optimistic
 about how stable those activations are once the full benchmark distribution is
-restored. On the targeted provider screen, \texttt{gpt-5-chat} looks broadly
-active across multiple families. On the full benchmark, the same model still
-performs strongly by local standards, but the mass remains concentrated in
-office, web, and security, with only a narrow image exception, no successful
-speech tasks, and no successful video task. \texttt{NeuroKit} is the clearest
-internal warning sign: it appears as a success-bearing family in the screen but
-falls back into the graded-but-unsuccessful regime on the full family slice.
+restored. The three full sweeps do not collapse into one provider story.
+\texttt{gpt-5.2} broadens dramatically on the full benchmark, adding speech,
+physiological-signal, security, and image families that are dark or only
+partially active for \texttt{gpt-5-chat}, while \texttt{Gemini-2.5-Pro} stays
+narrow and mostly office/security. Even within the GPT family, the full sweeps
+redistribute success across families: \texttt{gpt-5-chat} keeps
+\texttt{Trafilatura} as an active web family, whereas \texttt{gpt-5.2} trades
+that family for broader speech and image coverage.
 
 This matters for future method papers. If authors use a short targeted slice to
 motivate a broad capability claim, they may accidentally report family
-activation as if it were family robustness. Our recommendation is therefore
-two-stage. Targeted screens are useful for triage, sanity checks, and expanding
-model coverage quickly. But any family-level positive result that becomes part
-of the paper's main narrative should be backstopped by at least one
-full-benchmark or full-family check under the same official metric contract.
+activation as if it were family robustness, or they may miss where a model's
+full-benchmark success budget actually lands. Our recommendation is therefore
+two-stage. Targeted screens are useful for triage, sanity checks, and
+expanding model coverage quickly. But any family-level positive result that
+becomes part of the paper's main narrative should be backstopped by at least
+one full-benchmark or full-family check under the same official metric
+contract.
 
 \subsection{Why This Matters For Future Agent Papers}
 

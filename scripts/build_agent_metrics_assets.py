@@ -20,7 +20,11 @@ PROVIDER14_ROWS_CSV = DATA / "20260401-gittaskbench-provider14-official-metrics.
 PROVIDER14_MODEL_CSV = DATA / "20260401-gittaskbench-provider14-official-metrics.model_summary.csv"
 PROVIDER14_ROWS_FALLBACK_CSV = DATA / "20260401-gittaskbench-provider14-partial-official-metrics.rows.csv"
 PROVIDER14_MODEL_FALLBACK_CSV = DATA / "20260401-gittaskbench-provider14-partial-official-metrics.model_summary.csv"
-PROVIDER54_ROWS_CSV = DATA / "20260401-gpt5chat-full54-official-metrics.rows.csv"
+PROVIDER54_MODEL_CSVS = [
+    DATA / "20260401-gpt5chat-full54-official-metrics.model_summary.csv",
+    DATA / "20260401-gpt52-full54-official-metrics.model_summary.csv",
+    DATA / "20260401-gemini25pro-full54-official-metrics.model_summary.csv",
+]
 
 FAMILY_TO_DOMAIN = {
     "AnimeGANv3": "Image",
@@ -81,6 +85,14 @@ def read_optional_csv(primary, fallback=None):
     return []
 
 
+def read_many_csv(paths):
+    rows = []
+    for path in paths:
+        if path.exists():
+            rows.extend(read_csv(path))
+    return rows
+
+
 def escape_tex(text):
     return (
         text.replace("\\", "\\textbackslash{}")
@@ -103,13 +115,16 @@ def pretty_model(name):
     return PRETTY_MODEL.get(name, name)
 
 
-def format_family_list(text):
+def format_family_list(text, items_per_line=3):
     if not text:
         return "--"
     parts = [escape_tex(part.strip()) for part in text.split(";") if part.strip()]
-    if len(parts) <= 3:
+    if len(parts) <= items_per_line:
         return ", ".join(parts)
-    lines = [", ".join(parts[idx:idx + 3]) for idx in range(0, len(parts), 3)]
+    lines = [
+        ", ".join(parts[idx:idx + items_per_line])
+        for idx in range(0, len(parts), items_per_line)
+    ]
     return "\\shortstack[l]{" + "\\\\ ".join(lines) + "}"
 
 
@@ -246,38 +261,47 @@ def build_provider_screen_table(model_rows):
     write(TABLES / "provider_screen.tex", "\n".join(lines))
 
 
-def build_provider_full54_domain_table(rows):
-    if not rows:
+def build_provider_full54_summary_table(model_rows):
+    if not model_rows:
         return
-    stats = defaultdict(lambda: {"total": 0, "process": 0, "result": 0})
-    for row in rows:
-        domain = FAMILY_TO_DOMAIN[row["family"]]
-        stats[domain]["total"] += 1
-        stats[domain]["process"] += int(row["official_process"] == "True")
-        stats[domain]["result"] += int(row["official_result"] == "True")
+    rows = sorted(
+        model_rows,
+        key=lambda row: (
+            -int(row["official_result_true"]),
+            -int(row["official_process_true"]),
+            pretty_model(row["model"]),
+        ),
+    )
 
     lines = [
         "\\begin{table}[t]",
-        "\\caption{Supplementary full-benchmark \\texttt{gpt-5-chat} run summarized by the same fixed family-to-domain map used for the comparable local cohort. Process and Result are paper-side aggregates over official outputs.}",
-        "\\label{tab:provider-full54-domain}",
+        "\\caption{Supplementary full-benchmark provider sweeps under the same local GitTaskBench setup. Listed families contain at least one official \\resultmetric$=$True row.}",
+        "\\label{tab:provider-full54-summary}",
         "\\centering",
-        "\\small",
-        "\\begin{tabular}{lrr}",
+        "\\scriptsize",
+        "\\setlength{\\tabcolsep}{3.5pt}",
+        "\\begin{tabular}{@{}p{0.17\\columnwidth}ccp{0.47\\columnwidth}@{}}",
         "\\toprule",
         f"\\rowcolor{{{TABLE_HEADER}}}",
-        "Domain & Process & Result \\\\",
+        "Model & Process & Result & Families with Result \\\\",
         "\\midrule",
         f"\\rowcolors{{2}}{{{TABLE_ALT}}}{{white}}",
     ]
-    for domain in DOMAIN_ORDER:
-        item = stats[domain]
-        if item["total"] == 0:
-            continue
+    for row in rows:
         lines.append(
-            f'{domain} & {item["process"]} & {item["result"]} \\\\'
+            f'{escape_tex(pretty_model(row["model"]))} & '
+            f'{row["official_process_true"]} & '
+            f'{row["official_result_true"]} & '
+            f'{format_family_list(row["families_with_official_result"], items_per_line=2)} \\\\'
         )
-    lines.extend(["\\bottomrule", "\\end{tabular}", "\\end{table}", ""])
-    write(TABLES / "provider_full54_domain.tex", "\n".join(lines))
+    lines.extend([
+        "\\bottomrule",
+        "\\end{tabular}",
+        "\\setlength{\\tabcolsep}{6pt}",
+        "\\end{table}",
+        "",
+    ])
+    write(TABLES / "provider_full54_summary.tex", "\n".join(lines))
 
 
 def plot_model_summary(rows):
@@ -409,13 +433,13 @@ def main():
     shared_rows = read_csv(SHARED_CSV)
     provider_rows = read_optional_csv(PROVIDER14_ROWS_CSV, PROVIDER14_ROWS_FALLBACK_CSV)
     provider_model_rows = read_optional_csv(PROVIDER14_MODEL_CSV, PROVIDER14_MODEL_FALLBACK_CSV)
-    provider54_rows = read_optional_csv(PROVIDER54_ROWS_CSV)
+    provider54_model_rows = read_many_csv(PROVIDER54_MODEL_CSVS)
 
     build_model_summary_table(model_rows)
     build_domain_table(row_records)
     build_shared_table(shared_rows)
     build_provider_screen_table(provider_model_rows)
-    build_provider_full54_domain_table(provider54_rows)
+    build_provider_full54_summary_table(provider54_model_rows)
     plot_model_summary(model_rows)
     plot_domain_summary(row_records)
     plot_task_heatmap(row_records)
