@@ -57,6 +57,13 @@ DOMAIN_PROCESS_COLOR = "#b7e4c7"
 DOMAIN_RESULT_COLOR = "#ffd8a8"
 HEATMAP_CMAP = "GnBu"
 
+TITLE_FONT = 14
+LABEL_FONT = 12
+TICK_FONT = 10
+ANNOTATION_FONT = 9
+LEGEND_FONT = 10
+CBAR_FONT = 10
+
 PRETTY_MODEL = {
     "Qwen2.5-14B-Instruct": "Qwen2.5-14B",
     "Qwen2.5-32B-Instruct": "Qwen2.5-32B",
@@ -170,7 +177,7 @@ def build_domain_table(row_records):
 
     lines = [
         "\\begin{table}[t]",
-        "\\caption{Comparable cohort summarized by a fixed family-to-domain map. Process and Result are paper-side aggregates of official \\processmetric$=$True and \\resultmetric$=$True rows.}",
+        "\\caption{Comparable cohort summarized by a fixed family-to-domain map. Process and Result are aggregates of official \\processmetric$=$True and \\resultmetric$=$True rows.}",
         "\\label{tab:domain-summary}",
         "\\centering",
         "\\small",
@@ -183,8 +190,9 @@ def build_domain_table(row_records):
     ]
     for domain in DOMAIN_ORDER:
         item = stats[domain]
+        label = "Physiological" if domain == "Physio" else domain
         lines.append(
-            f'{domain} & {item["process"]} & {item["result"]} \\\\'
+            f'{label} & {item["process"]} & {item["result"]} \\\\'
         )
     lines.extend(["\\bottomrule", "\\end{tabular}", "\\end{table}", ""])
     write(TABLES / "domain_summary.tex", "\n".join(lines))
@@ -232,7 +240,7 @@ def build_provider_screen_table(model_rows):
 
     lines = [
         "\\begin{table}[t]",
-        "\\caption{Targeted provider robustness screen covering the main success-bearing families, the main graded-but-unsuccessful families, and one image/video stress check. Reported separately from the comparable cohort; listed families contain at least one official \\resultmetric$=$True row.}",
+        "\\caption{Targeted provider cohort covering the main success-bearing families, the main graded-but-unsuccessful families, and one image/video stress check. Reported separately from the comparable cohort; listed families contain at least one official \\resultmetric$=$True row.}",
         "\\label{tab:provider-screen}",
         "\\centering",
         "\\small",
@@ -319,24 +327,40 @@ def plot_model_summary(rows):
 
     y = np.arange(len(labels))
     h = 0.38
-    fig, ax = plt.subplots(figsize=(8.2, 4.8))
+    fig, ax = plt.subplots(figsize=(8.4, 5.1))
     fig.patch.set_facecolor("white")
     ax.set_facecolor("white")
     ax.barh(y + h / 2, process, height=h, color=MODEL_PROCESS_COLOR, label="Process")
     ax.barh(y - h / 2, result, height=h, color=MODEL_RESULT_COLOR, label="Result")
     ax.set_yticks(y)
-    ax.set_yticklabels(labels, fontsize=8)
-    ax.set_xlabel("Official success count")
+    ax.set_yticklabels(labels, fontsize=TICK_FONT)
+    ax.tick_params(axis="x", labelsize=TICK_FONT)
+    ax.set_xlabel("Official success count", fontsize=LABEL_FONT)
     ax.set_xlim(0, 10)
     ax.grid(axis="x", linestyle="--", alpha=0.3)
-    ax.legend(frameon=False, loc="lower right")
-    ax.set_title("Comparable open-model cohort under GitTaskBench official metrics")
+    ax.legend(frameon=False, loc="lower right", fontsize=LEGEND_FONT)
+    ax.set_title(
+        "Comparable open-model cohort under GitTaskBench official metrics",
+        fontsize=TITLE_FONT,
+    )
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     for idx, value in enumerate(process):
-        ax.text(value + 0.12, y[idx] + h / 2, str(value), va="center", fontsize=8)
+        ax.text(
+            value + 0.12,
+            y[idx] + h / 2,
+            str(value),
+            va="center",
+            fontsize=ANNOTATION_FONT,
+        )
     for idx, value in enumerate(result):
-        ax.text(value + 0.12, y[idx] - h / 2, str(value), va="center", fontsize=8)
+        ax.text(
+            value + 0.12,
+            y[idx] - h / 2,
+            str(value),
+            va="center",
+            fontsize=ANNOTATION_FONT,
+        )
     fig.tight_layout()
     fig.savefig(FIGURES / "figure_model_summary.pdf")
     fig.savefig(FIGURES / "figure_model_summary.png", dpi=220)
@@ -356,18 +380,22 @@ def plot_domain_summary(row_records):
 
     x = np.arange(len(DOMAIN_ORDER))
     w = 0.36
-    fig, ax = plt.subplots(figsize=(8.0, 3.8))
+    fig, ax = plt.subplots(figsize=(8.2, 4.2))
     fig.patch.set_facecolor("white")
     ax.set_facecolor("white")
     ax.bar(x - w / 2, process_rates, width=w, color=DOMAIN_PROCESS_COLOR, label="Process rate")
     ax.bar(x + w / 2, result_rates, width=w, color=DOMAIN_RESULT_COLOR, label="Result rate")
     ax.set_xticks(x)
-    ax.set_xticklabels(DOMAIN_ORDER, fontsize=8)
+    ax.set_xticklabels(DOMAIN_ORDER, fontsize=TICK_FONT)
+    ax.tick_params(axis="y", labelsize=TICK_FONT)
     ax.set_ylim(0, 0.25)
-    ax.set_ylabel("Rate")
+    ax.set_ylabel("Rate", fontsize=LABEL_FONT)
     ax.grid(axis="y", linestyle="--", alpha=0.3)
-    ax.legend(frameon=False, loc="upper right")
-    ax.set_title("Success mass concentrates in office, security, web, and speech")
+    ax.legend(frameon=False, loc="upper right", fontsize=LEGEND_FONT)
+    ax.set_title(
+        "Success mass concentrates in office, security, web, and speech",
+        fontsize=TITLE_FONT,
+    )
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     for idx, domain in enumerate(DOMAIN_ORDER):
@@ -378,7 +406,7 @@ def plot_domain_summary(row_records):
             f'{process_rates[idx]:.2f}',
             ha="center",
             va="bottom",
-            fontsize=7,
+            fontsize=ANNOTATION_FONT,
             rotation=90,
         )
         ax.text(
@@ -387,7 +415,7 @@ def plot_domain_summary(row_records):
             f'{result_rates[idx]:.2f}',
             ha="center",
             va="bottom",
-            fontsize=7,
+            fontsize=ANNOTATION_FONT,
             rotation=90,
         )
     fig.tight_layout()
@@ -408,18 +436,22 @@ def plot_task_heatmap(row_records):
         for j, task_id in enumerate(selected_tasks):
             matrix[i, j] = lookup.get((model, task_id), 0)
 
-    fig, ax = plt.subplots(figsize=(8.4, 3.8))
+    fig, ax = plt.subplots(figsize=(8.8, 4.3))
     fig.patch.set_facecolor("white")
     ax.set_facecolor("white")
     im = ax.imshow(matrix, cmap=HEATMAP_CMAP, aspect="auto", vmin=0, vmax=1)
     ax.set_yticks(np.arange(len(models)))
-    ax.set_yticklabels([pretty_model(m) for m in models], fontsize=8)
+    ax.set_yticklabels([pretty_model(m) for m in models], fontsize=TICK_FONT)
     ax.set_xticks(np.arange(len(selected_tasks)))
-    ax.set_xticklabels(selected_tasks, rotation=40, ha="right", fontsize=8)
-    ax.set_title("Tied headline scores still hide task-family specialization")
+    ax.set_xticklabels(selected_tasks, rotation=40, ha="right", fontsize=TICK_FONT)
+    ax.set_title(
+        "Tied headline scores still hide task-family specialization",
+        fontsize=TITLE_FONT,
+    )
     cbar = fig.colorbar(im, ax=ax, fraction=0.04, pad=0.02)
     cbar.set_ticks([0, 1])
     cbar.set_ticklabels(["0", "1"])
+    cbar.ax.tick_params(labelsize=CBAR_FONT)
     fig.tight_layout()
     fig.savefig(FIGURES / "figure_task_heatmap.pdf")
     fig.savefig(FIGURES / "figure_task_heatmap.png", dpi=220)
