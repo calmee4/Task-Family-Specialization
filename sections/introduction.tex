@@ -1,97 +1,71 @@
 \section{Introduction}
 
-Agent evaluation is quickly moving beyond single-turn QA into web navigation,
+Agent evaluation has expanded rapidly from single-turn QA into web navigation,
 mobile environments, software engineering, and repository-grounded tool use
 \cite{agentbench,webarena,visualwebarena,androidworld,swebench,swelancer,ambigswe,longsoftwaretasks,gittaskbench,toolgym,deepresearchbench,mcpbench,mcpuniverse}.
-Real deployments are rarely pure language tasks. They require interacting with
-interfaces, repositories, and heterogeneous tools
-while producing structured outputs that can be checked automatically.
+Repository-grounded benchmarks are especially demanding: they require agents to
+interact with real codebases, produce structured artifacts, and pass evaluator
+scripts that can distinguish partial execution from full task completion. Yet
+the dominant reporting convention collapses all of this into a single global
+success rate per model.
 
-At the same time, the dominant reporting habit has remained simple. A model is
-usually assigned one benchmark score, often one success rate, and the result is
-read as an intrinsic capability measure. Recent work has already pushed back on
-that simplification from several angles. Trajectory-oriented analysis argues
-that final success hides diagnostically important execution structure
-\cite{agentrx,trajeval}. Measurement work on long-context and benchmark scaling
-argues that aggregate scores can conceal important task-specific variation
-\cite{lostmiddle,longbench,ruler,infinitebench,nolima,loogle,illusiondiminishingreturns}.
-Multimodal evaluation further shows that answer channel, extraction quality, and
-benchmark family can all matter for what a score actually means
-\cite{mme,mmmu,mathvista,hallusionbench,blink}. These critiques point in the
-same direction: one reported score can hide multiple latent conditions of
-success.
+That single number discards structure the benchmark has already computed. Prior
+work has identified this concern from multiple angles: trajectory-level
+diagnosis reveals that final success hides execution-level failure modes
+\cite{agentrx,trajeval}; long-context measurement shows that aggregate scores
+can conceal task-specific variation
+\cite{lostmiddle,longbench,ruler,infinitebench,nolima,loogle,illusiondiminishingreturns};
+and multimodal evaluation demonstrates that answer channel and benchmark family
+affect what a score actually means
+\cite{mme,mmmu,mathvista,hallusionbench,blink}. These critiques converge on a
+shared lesson: when a benchmark already records intermediate evaluation states,
+collapsing them into one headline number throws away evidence the evaluator has
+already provided.
 
-This paper studies a narrow measurement problem in \gittaskbench.
-\gittaskbench already separates \processmetric from \resultmetric. The former
-marks traces that reach grading with an output artifact. The latter marks
-traces whose recorded artifact satisfies the official task criterion. Some
-traces never reach grading; others reach grading but still fail. If both cases
-are collapsed into a single final success rate, important structure
-disappears.
+\gittaskbench \cite{gittaskbench} provides exactly this kind of underused
+structure. Its official evaluator emits two fields for every graded trace:
+\processmetric, which marks whether the trace advanced far enough to produce a
+gradeable artifact, and \resultmetric, which marks whether that artifact
+satisfies the task criterion. This creates three observable states---traces that
+never reach grading, traces that reach grading but fail, and traces that fully
+succeed---yet published results typically report only the last.
 
-The empirical design stays deliberately simple. The primary evidence is a
-comparable open-model cohort on \gittaskbench. We then add a smaller
-\texttt{Trafilatura\_01/02} subset on web-extraction tasks that extends
-coverage to provider models, including \texttt{gpt-5.2} and
-\texttt{Gemini-2.5-Pro}. We also add a targeted provider cohort on
-\texttt{gpt-5-chat}, \texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro} so the
-paper does not reduce to a purely within-open-model comparison. For the
-task-aligned \texttt{Trafilatura} subset, we align identical benchmark tasks
-across models without treating that subset as a frontier ranking. All plots and
-tables report official \processmetric and \resultmetric totals or deterministic
-aggregates derived from them. Finally, we add full-benchmark provider sweeps for
-\texttt{gpt-5-chat}, \texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro} to test
-whether the targeted subset remains representative once the full benchmark
-distribution is restored.
+We audit this official \processmetric/\resultmetric split across a comparable
+open-model cohort evaluated on the full \gittaskbench task set, and supplement
+it with provider-model evaluations at two granularities---a targeted task screen
+and full-benchmark sweeps---so that the analysis does not rest on a single model
+family. All reported numbers are aggregated from the benchmark's official
+outputs; derived rates and visualizations are marked as paper-side summaries.
 
-The evidence hierarchy is intentional. The comparable cohort is the paper's
-primary evidence. The \texttt{Trafilatura} subset, the targeted provider
-cohort, the supplementary full-benchmark provider cohorts, and the short
-open-model breadth extension are secondary analyses used to test whether the
-same family structure survives broader model coverage.
-
-Three findings motivate the paper. First, official success is narrow and
-domain-skewed. In the comparable cohort, all observed \resultmetric mass
-lies in office, security, web, and speech families; image and video families
-are complete zeros. Second, tied headline totals hide family specialization.
-The three headline leaders in the comparable cohort tie on official
-\resultmetric success, but they succeed
-on different tasks and families. The targeted provider cohort adds a second
-measurement point: broader frontier coverage changes which families activate,
-but provider models are themselves highly non-uniform on the same official
-tasks. The full-benchmark provider sweeps sharpen that point further:
-\texttt{gpt-5.2} expands into additional speech, security, physiological-signal,
-and image families, \texttt{gpt-5-chat} remains concentrated in office, web,
-and security with only a narrow image exception, and
-\texttt{Gemini-2.5-Pro} stays narrow. Third,
-\processmetric$=$True,
-\resultmetric$=$False rows are not random residue. They cluster in structured
-extraction families and mix threshold misses, parser failures, and
-evaluation-side errors after grading begins.
-
-The supported claim is simple. On the evaluated \gittaskbench cohorts,
-reporting only a single global \resultmetric rate hides family-specific
-competence and a structured \processmetric$=$True,
-\resultmetric$=$False regime already visible in the benchmark's own outputs.
+Four patterns emerge from this audit. First, official \resultmetric success is
+narrow and domain-skewed, concentrating in office-document, security, web, and
+speech families while image and video families produce no observed success.
+Second, models that tie on global \resultmetric totals succeed on materially
+different task families, revealing hidden specialization that a single score
+cannot surface. Third, provider models do not form one uniform control
+condition: they activate different families on the same benchmark tasks, and
+targeted screens can both overstate and miss activations found in full-benchmark
+sweeps. Fourth, the intermediate \processmetric$=$True,
+\resultmetric$=$False regime clusters in structured-extraction families rather
+than appearing as random residue, mixing threshold misses, parser failures, and
+evaluation-side errors.
 
 \paragraph{Contributions.}
-This paper makes four concrete contributions.
+This paper makes four contributions.
 \begin{enumerate}[leftmargin=1.25em]
-\item We construct an official-metric study of \gittaskbench over a
-comparable open-model cohort together with task-aligned and provider-side
-supplementary cohorts, while keeping the benchmark's official
-\processmetric/\resultmetric contract fixed.
-\item We show that official \resultmetric success is highly concentrated in a
-small subset of domains and families rather than being smoothly distributed
-across the benchmark.
-\item We show that tied global \resultmetric totals hide material
-task-family specialization across models.
-\item We identify an official \processmetric$=$True, \resultmetric$=$False
-regime that clusters in structured extraction families and should be reported
+\item We show that official \resultmetric success on \gittaskbench is highly
+concentrated in a small subset of domains and task families rather than being
+smoothly distributed across the benchmark.
+\item We show that tied global \resultmetric totals hide material task-family
+specialization across models.
+\item We show that provider models are not interchangeable on \gittaskbench:
+they activate different task families, and targeted evaluation slices do not
+reliably predict full-benchmark outcomes.
+\item We identify a structured \processmetric$=$True, \resultmetric$=$False
+regime that clusters in extraction-heavy families and should be reported
 explicitly in future repo-grounded evaluations.
 \end{enumerate}
 
-The paper is therefore a descriptive benchmark study. We report exact observed
-\processmetric/\resultmetric counts from the evaluated cohorts, and we use the
-provider slices as supplementary analyses rather than as claims about a stable
-frontier ranking.
+\noindent This paper is a descriptive benchmark study. We report exact observed
+counts from the evaluated cohorts and use provider slices as robustness checks
+rather than as frontier rankings.
