@@ -51,7 +51,8 @@ than appearing as random residue, mixing threshold misses, parser failures, and
 evaluation-side errors.
 
 \paragraph{Contributions.}
-This paper makes four contributions.
+This paper makes four empirical contributions and one methodological
+contribution.
 \begin{enumerate}[leftmargin=1.25em]
 \item We show that official \resultmetric success on \gittaskbench is highly
 concentrated in a small subset of domains and task families rather than being
@@ -64,8 +65,10 @@ reliably predict full-benchmark outcomes.
 \item We identify a structured \processmetric$=$True, \resultmetric$=$False
 regime that clusters in extraction-heavy families and should be reported
 explicitly in future repo-grounded evaluations.
+\item Based on these findings, we propose a minimal reporting standard for
+repo-grounded agent benchmarks that preserves the official
+\processmetric/\resultmetric split and family-level slices alongside any
+global pass rate (Section~5.1). The standard is lightweight---it requires no
+new metrics, judges, or infrastructure---and is immediately adoptable by any
+paper that uses a benchmark with separable success conditions.
 \end{enumerate}
-
-\noindent This paper is a descriptive benchmark study. We report exact observed
-counts from the evaluated cohorts and use provider slices as robustness checks
-rather than as frontier rankings.

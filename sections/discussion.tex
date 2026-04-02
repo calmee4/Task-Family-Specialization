@@ -1,111 +1,56 @@
 \section{Discussion}
 
-\subsection{Reporting Implications}
+\subsection{Reporting Recommendations}
 
-Our evidence supports three low-cost reporting choices for repo-grounded agent
-benchmarks.
+Our evidence supports a lightweight reporting standard for repo-grounded agent
+benchmarks. A minimal benchmark table should contain four pieces of
+information:
 \begin{enumerate}[leftmargin=1.25em]
-\item Report the benchmark's official \processmetric and \resultmetric fields
-separately whenever both are available, so readers can distinguish
-\processmetric$=$False from \processmetric$=$True,
-\resultmetric$=$False outcomes.
-\item Report family or domain slices in addition to one global total.
-\item Include representative official \processmetric$=$True,
-\resultmetric$=$False comments for structured extraction tasks, not only
-aggregate pass counts.
+\item A row of global official totals, providing a compact headline.
+\item Family or domain slices, so readers can see where success mass
+actually lands.
+\item The benchmark's official \processmetric and \resultmetric fields reported
+separately, so readers can distinguish \processmetric$=$False from
+\processmetric$=$True, \resultmetric$=$False outcomes.
+\item Representative official \processmetric$=$True, \resultmetric$=$False
+comments from the families that dominate that regime, not only aggregate pass
+counts.
 \end{enumerate}
 
-These choices are conservative: benchmark papers should expose existing
-official structure rather than hide it behind one number.
-
-\subsection{A Minimal Report Structure}
-
-The paper's practical recommendation can be made more concrete. A minimal
-repo-grounded benchmark table should contain at least four pieces of
-information. First, one row of global official totals remains useful, because it
-provides a compact benchmark headline. Second, the same table or a companion
-figure should report family or domain slices, so the reader can see where the
-success mass actually lands. Third, the paper should expose at least a small
-sample of official \processmetric$=$True, \resultmetric$=$False comments from
-rather than as part of the benchmark-wide cohort. Fourth, any separate
-targeted subset, such as our provider cohort, should be labeled explicitly as a supplementary analysis
-rather than silently merged into the main benchmark cohort.
-
-This standard is intentionally lightweight. It does not require trajectory
-annotation, human judges, or new benchmark infrastructure. It only requires
-authors to preserve and report structure that the benchmark already emits. That
-is why we view the proposal as realistic. It is closer to better bookkeeping
-than to a new evaluation methodology.
+\noindent Any separate targeted subset, such as our provider cohort, should be
+labeled explicitly as a supplementary analysis rather than silently merged into
+the main cohort. This standard requires no trajectory annotation, human judges,
+or new benchmark infrastructure---only that authors preserve structure the
+benchmark already emits.
 
 \subsection{Benchmark-Design Implications}
 
-The reporting claim also has a benchmark-design implication. If a benchmark
-provides family labels, evaluator comments, and intermediate states such as
-\processmetric$=$True, \resultmetric$=$False, then future releases should treat
-those fields as first-class outputs rather than as debugging residue. The same
-benchmark can still keep one compact leaderboard score, but the artifact bundle
-should make it easy for papers to recover family slices and the clustered
-graded-but-unsuccessful regime without manual relabeling. This is consistent
-with broader evaluation frameworks such as \texttt{HELM} and
-\texttt{Dynabench}, which argue that benchmark reports should preserve richer
-structure than one scalar headline \cite{helm,dynabench}.
+If a benchmark provides family labels, evaluator comments, and intermediate
+states such as \processmetric$=$True, \resultmetric$=$False, then future
+releases should treat those fields as first-class outputs rather than as
+debugging residue. The same benchmark can still keep one compact leaderboard
+score, but the artifact bundle should make it easy for downstream papers to
+recover family slices and the graded-but-unsuccessful regime without manual
+relabeling. This is consistent with broader evaluation frameworks such as
+\texttt{HELM} and \texttt{Dynabench}, which argue that benchmark reports should
+preserve richer structure than one scalar headline \cite{helm,dynabench}.
 
-Our results also suggest a practical split between benchmark-wide evaluation and
-targeted stress slices. Benchmark-wide cohorts remain the only defensible basis
-for claims about family concentration and robustness. Targeted slices are still
-valuable, but they should be framed as probes: they can show that a family
-activates at all, that a zero is not absolute, or that one model class reaches a
-different intermediate regime. What they should not do is silently replace the
-benchmark-wide cohort. That distinction is especially important for
-repo-grounded agents, where individual families can differ sharply in external
-dependencies, artifact formats, and evaluator thresholds.
+\subsection{Provider Models and Targeted Evaluations}
 
-\subsection{Providers Are Not One Control Condition}
+Two practical lessons emerge from the provider cohorts. First, papers that use
+one strong provider model as a qualitative control often discuss ``closed
+models'' as if they formed one stable reference class. Our results show
+otherwise: on the same benchmark tasks, different provider models activate
+different task families. Reporting family slices is therefore important not
+only for open-model comparisons but also for provider-model baselines.
 
-The targeted provider cohort adds one more practical lesson. Papers often
-use one strong provider model as a qualitative control and then discuss ``closed
-models'' as if they formed one stable reference class. Our evidence does not
-support that shortcut. On the same targeted GitTaskBench subset, \texttt{gpt-5-chat},
-\texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro} occupy very different parts of the
-\processmetric/\resultmetric space. This does not prove a frontier ranking, but
-it does show that provider breadth matters even for a conservative benchmark
-study. One provider model can light up \texttt{Scrapy} or \texttt{NeuroKit}
-while another barely reaches grading outside \texttt{PDFPlumber}.
-
-That observation interacts directly with how open-model comparisons are read.
-When an open-model cohort records zero official \resultmetric success on some
-family, the next question should not be ``can one cherry-picked provider model
-solve it?'' The more useful question is whether the family activates
-consistently across a broader model class. In the present study,
-\texttt{NeuroKit} and \texttt{Scrapy} move under both GPT-family models, while
-the targeted image and video stressors in that subset stay dark. This is
-exactly why we recommend reporting family slices rather than only one total or
-one anecdotal frontier run.
-
-\subsection{Targeted Subsets Need Full-Benchmark Backstops}
-
-The separate full-benchmark provider sweeps add a second lesson. A
-targeted subset is good at finding activation points, but it can be optimistic
-about how stable those activations are once the full benchmark distribution is
-restored. The three full sweeps do not collapse into one provider story.
-\texttt{gpt-5.2} shows materially broader full-benchmark coverage in the
-evaluated sweeps, adding speech, physiological-signal, security, and image families
-that are dark or only partially active for \texttt{gpt-5-chat}, while
-\texttt{Gemini-2.5-Pro} stays
-narrow and mostly office/security. Even within the GPT family, the full sweeps
-redistribute success across families: \texttt{gpt-5-chat} keeps
-\texttt{Trafilatura} as an active web family, whereas \texttt{gpt-5.2} shifts
-more of its observed success footprint toward speech and image families.
-
-This matters for future method papers. If authors use a short targeted subset to
-motivate a broad capability claim, they may accidentally report family
-activation as if it were family robustness, or they may miss where a model's
-full-benchmark success budget actually lands. Our recommendation is therefore
-two-stage. Targeted subsets are useful for triage, sanity checks, and
-expanding model coverage quickly. But any family-level positive result that
-becomes part of the paper's main narrative should be backstopped by at least
-one full-benchmark or full-family check under the same official metric
-contract.
+Second, targeted evaluation subsets are useful for triage and for checking
+whether a family activates at all, but they should not be treated as proxies
+for full-benchmark evaluation. Our full-benchmark sweeps show that targeted
+subsets can both overstate activations that disappear under the full task
+distribution and miss activations that only emerge there. Any family-level
+positive result that enters the paper's main narrative should be backstopped by
+at least one full-benchmark check under the same official metric contract.
 
 \subsection{Why This Matters For Future Agent Papers}
 
@@ -117,63 +62,62 @@ apparent gain may come from improving just one structured family, from making
 more traces gradeable without improving their final correctness, or from moving
 one domain while leaving other domains unchanged.
 
-This paper does not resolve those ambiguities. It makes them visible.
-That is the right scope for the current evidence. The benchmark already tells us
-more than most papers currently report, and that extra information becomes more
-important as agent papers become more incremental. Once multiple papers begin to
-cluster around small absolute gains, family-level slices and the
-\processmetric/\resultmetric split will be necessary for knowing whether two
-systems improved in the same way at all.
+This paper does not resolve those ambiguities. It makes them visible. The
+benchmark already tells us more than most papers currently report, and that
+extra information becomes more important as agent papers become more
+incremental. Once multiple papers cluster around small absolute gains,
+family-level slices and the \processmetric/\resultmetric split will be
+necessary for knowing whether two systems improved in the same way at all.
 
-\subsection{Working Hypotheses Behind The Family Patterns}
+\subsection{Working Hypotheses}
 
-The current paper is descriptive, but the observed patterns already suggest
-testable mechanisms. The clustered \processmetric$=$True,
-\resultmetric$=$False regime is concentrated in families with schema-sensitive
-or threshold-sensitive grading. \texttt{Eparse}, \texttt{PDFPlumber},
-\texttt{Scrapy}, and \texttt{NeuroKit} all require the agent to produce
-structured outputs that survive parsing and field-level validation after the
-trace has already reached grading. The benchmark comments are consistent with
-that picture: threshold misses, XML parsing failures, and evaluation-side
-record-processing errors all preserve enough execution to become gradeable while
-still failing the task criterion.
+The current paper is descriptive, but the observed patterns suggest testable
+mechanisms. The clustered \processmetric$=$True, \resultmetric$=$False regime
+is concentrated in families with schema-sensitive or threshold-sensitive
+grading. \texttt{Eparse}, \texttt{PDFPlumber}, \texttt{Scrapy}, and
+\texttt{NeuroKit} all require the agent to produce structured outputs that
+survive parsing and field-level validation after the trace has already reached
+grading. The benchmark comments are consistent with that picture: threshold
+misses, XML parsing failures, and evaluation-side record-processing errors all
+preserve enough execution to become gradeable while still failing the task
+criterion.
 
-A second working hypothesis is that family specialization reflects different
-mixtures of prior tool familiarity, data exposure, and output-format control
-rather than one scalar notion of ``agent strength.'' The leading Qwen models do
-not spend their success budget on the same families, and the targeted provider cohort
-changes which web and physiological-signal families activate without rescuing
-the image/video stressors. A plausible interpretation is that structured
-extraction, light web processing, and speech JSON tasks reward different priors,
-while image/video families remain bottlenecked by heavier external dependencies
-and repo-specific execution demands under the current agent setup. We do not
-test these mechanisms here, but they define concrete targets for the next stage
-of trajectory-level analysis.
+A second hypothesis is that family specialization reflects different mixtures of
+prior tool familiarity, data exposure, and output-format control rather than one
+scalar notion of ``agent strength.'' The leading Qwen models do not spend their
+success budget on the same families, and the provider cohort changes which web
+and physiological-signal families activate without rescuing the image/video
+stressors. A plausible interpretation is that structured extraction, light web
+processing, and speech JSON tasks reward different priors, while image/video
+families remain bottlenecked by heavier external dependencies and repo-specific
+execution demands. These hypotheses define concrete targets for future
+trajectory-level analysis.
 
 \subsection{Limitations}
 
-The paper has clear limits. First, the main evidence is a fixed study cohort
-rather than a synchronized scrape of the public \gittaskbench leaderboard.
-Second, broader provider coverage currently exists only on the small shared
-\texttt{Trafilatura} subset, which is aligned by task but not intended as a
-matched frontier rerun. Third, the supplementary open-model breadth cohort is
-also task-limited; we use it only to test whether the family concentration
-extends to a broader roster on the same targeted subset. Fourth, some
-\processmetric$=$False mass may still reflect evaluation-pipeline brittleness
-rather than pure model weakness. Some
-\processmetric$=$True, \resultmetric$=$False rows also include evaluation-side
-errors rather than pure threshold misses. Finally, each reported cohort total is
-a single-run count rather than a variance estimate, so small model gaps should
-be read descriptively. For these reasons, we present the paper as a descriptive
-benchmark analysis, not as a universal scaling law.
+The paper has clear limits. Most importantly, the entire study is conducted on
+a single benchmark. We chose \gittaskbench because it is, to our knowledge, the
+only repository-grounded agent benchmark that emits a structured
+\processmetric/\resultmetric split as part of its official evaluator contract,
+making the analysis possible without inventing new metrics. However, the
+specific patterns we observe---the domain skew, the family specialization, the
+clustering of the graded-but-unsuccessful regime---may be partly shaped by how
+\gittaskbench is constructed and weighted. Validating these structural
+observations on other benchmarks (e.g., \texttt{SWE-bench}, \texttt{OSWorld})
+would strengthen the generalizability of the reporting recommendations,
+although those benchmarks would first need to expose comparable intermediate
+evaluation states.
 
-\subsection{How This Connects to Richer Agent Analysis}
-
-The result here is deliberately simpler than full trajectory analysis. Recent
-work such as \texttt{AgentRx} and \texttt{TRAJEVAL} asks why an agent failed at a
-fine-grained trajectory level \cite{agentrx,trajeval}. Our claim comes earlier
-in the analysis pipeline. Before manual trajectory diagnosis, the official
-benchmark outputs already justify more structured reporting. That makes the
-\processmetric/\resultmetric split a useful bridge: richer trajectory work can
-build on it, but we should not ignore the information already provided by the
-benchmark.
+Beyond the single-benchmark scope, several additional limits apply. The main
+evidence is a fixed study cohort rather than a synchronized scrape of the
+public \gittaskbench leaderboard. Broader provider coverage exists only on the
+shared \texttt{Trafilatura} subset and the targeted provider cohort, neither of
+which is a matched frontier rerun. The supplementary open-model breadth cohort
+is task-limited. Some \processmetric$=$False mass may reflect
+evaluation-pipeline brittleness rather than pure model weakness, and some
+\processmetric$=$True, \resultmetric$=$False rows include evaluation-side
+errors rather than threshold misses. Finally, each cohort total is a single-run
+count rather than a variance estimate. Although generation uses temperature
+\texttt{0.0}, minor API-level non-determinism cannot be fully excluded, so
+small cell-level differences in the task heatmap should be read descriptively
+rather than as stable rankings.

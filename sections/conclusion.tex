@@ -1,30 +1,27 @@
 \section{Conclusion}
 
-We reanalyzed \gittaskbench using only its official \processmetric and
-\resultmetric outputs. On the evaluated cohorts, the benchmark's success mass
-is narrow, domain-skewed, and family-specific. Tied global totals hide material
-specialization, and official \processmetric$=$True, \resultmetric$=$False rows
-cluster in structured extraction families rather than behaving like random
-noise. A targeted provider cohort shows that broader frontier coverage also
-remains family-selective rather than collapsing into one uniform strong-model
-baseline, the supplementary open-model breadth cohort reproduces the same
-family concentration on a wider roster, and the full-benchmark provider sweeps
-show that short subsets can misstate where provider gains actually land. The
-paper therefore supports a
-simple measurement recommendation:
-repo-grounded agent evaluations should report the official
-\processmetric/\resultmetric split and family-level slices, not only one global
-pass rate.
+We audited \gittaskbench using only its official \processmetric and
+\resultmetric outputs and found four consistent patterns across the evaluated
+cohorts. Official success concentrates in a small subset of
+domains---office-document, security, web, and speech---while image and video
+remain dark. Models that tie on global totals succeed on different task
+families, exposing specialization that a single score obscures. Provider models
+are not interchangeable: they activate different families, and targeted
+evaluation subsets can both overstate and miss activations that appear in
+full-benchmark sweeps. The intermediate \processmetric$=$True,
+\resultmetric$=$False regime clusters in structured-extraction families, mixing
+threshold misses, parser failures, and evaluation-side errors rather than
+behaving as random residue.
 
-More broadly, the paper argues for a modest shift in how benchmark results are
-communicated. Future repo-grounded agent papers do not need new judges,
-taxonomies, or benchmarks to become more informative. They do need to report
-benchmark-visible intermediate structure instead of hiding it behind one
-aggregate number. If a method improves only one task family, or mainly converts
-\processmetric$=$False traces into gradeable-but-unsuccessful ones, that
-pattern should remain visible in the report.
+These findings lead to a practical recommendation. Repo-grounded agent
+evaluations should report the official \processmetric/\resultmetric split and
+family-level slices alongside any global pass rate. This requires no new
+judges, taxonomies, or infrastructure---only preserving structure that the
+benchmark already emits.
 
-That recommendation matters even more for incremental repo-grounded agent
-papers. Readers need to know whether systems improved the same families or
-simply activated different corners of the benchmark. One total is too weak a
-summary.
+The recommendation is especially important as repo-grounded agent papers become
+more incremental. When multiple systems cluster around small absolute gains,
+readers need family-level slices to judge whether two systems improved in the
+same way or simply activated different corners of the benchmark. Our findings
+are demonstrated on \gittaskbench; validating whether similar structural
+patterns hold on other repo-grounded benchmarks is a natural next step.
