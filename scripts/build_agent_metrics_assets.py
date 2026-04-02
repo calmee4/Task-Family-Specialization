@@ -57,12 +57,12 @@ DOMAIN_PROCESS_COLOR = "#b7e4c7"
 DOMAIN_RESULT_COLOR = "#ffd8a8"
 HEATMAP_CMAP = "GnBu"
 
-TITLE_FONT = 14
-LABEL_FONT = 12
-TICK_FONT = 10
-ANNOTATION_FONT = 9
-LEGEND_FONT = 10
-CBAR_FONT = 10
+TITLE_FONT = 17
+LABEL_FONT = 15
+TICK_FONT = 13
+ANNOTATION_FONT = 12
+LEGEND_FONT = 13
+CBAR_FONT = 13
 
 PRETTY_MODEL = {
     "Qwen2.5-14B-Instruct": "Qwen2.5-14B",
@@ -327,7 +327,7 @@ def plot_model_summary(rows):
 
     y = np.arange(len(labels))
     h = 0.38
-    fig, ax = plt.subplots(figsize=(8.4, 5.1))
+    fig, ax = plt.subplots(figsize=(8.4, 5.3))
     fig.patch.set_facecolor("white")
     ax.set_facecolor("white")
     ax.barh(y + h / 2, process, height=h, color=MODEL_PROCESS_COLOR, label="Process")
@@ -340,7 +340,7 @@ def plot_model_summary(rows):
     ax.grid(axis="x", linestyle="--", alpha=0.3)
     ax.legend(frameon=False, loc="lower right", fontsize=LEGEND_FONT)
     ax.set_title(
-        "Comparable open-model cohort under GitTaskBench official metrics",
+        "Comparable open-model cohort\nunder GitTaskBench official metrics",
         fontsize=TITLE_FONT,
     )
     ax.spines["top"].set_visible(False)
@@ -380,7 +380,7 @@ def plot_domain_summary(row_records):
 
     x = np.arange(len(DOMAIN_ORDER))
     w = 0.36
-    fig, ax = plt.subplots(figsize=(8.2, 4.2))
+    fig, ax = plt.subplots(figsize=(8.2, 4.5))
     fig.patch.set_facecolor("white")
     ax.set_facecolor("white")
     ax.bar(x - w / 2, process_rates, width=w, color=DOMAIN_PROCESS_COLOR, label="Process rate")
@@ -393,7 +393,7 @@ def plot_domain_summary(row_records):
     ax.grid(axis="y", linestyle="--", alpha=0.3)
     ax.legend(frameon=False, loc="upper right", fontsize=LEGEND_FONT)
     ax.set_title(
-        "Success mass concentrates in office, security, web, and speech",
+        "Success mass concentrates in office,\nsecurity, web, and speech",
         fontsize=TITLE_FONT,
     )
     ax.spines["top"].set_visible(False)
@@ -436,7 +436,7 @@ def plot_task_heatmap(row_records):
         for j, task_id in enumerate(selected_tasks):
             matrix[i, j] = lookup.get((model, task_id), 0)
 
-    fig, ax = plt.subplots(figsize=(8.8, 4.3))
+    fig, ax = plt.subplots(figsize=(8.8, 4.7))
     fig.patch.set_facecolor("white")
     ax.set_facecolor("white")
     im = ax.imshow(matrix, cmap=HEATMAP_CMAP, aspect="auto", vmin=0, vmax=1)
@@ -445,7 +445,7 @@ def plot_task_heatmap(row_records):
     ax.set_xticks(np.arange(len(selected_tasks)))
     ax.set_xticklabels(selected_tasks, rotation=40, ha="right", fontsize=TICK_FONT)
     ax.set_title(
-        "Tied headline scores still hide task-family specialization",
+        "Tied headline scores still hide\ntask-family specialization",
         fontsize=TITLE_FONT,
     )
     cbar = fig.colorbar(im, ax=ax, fraction=0.04, pad=0.02)
