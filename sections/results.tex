@@ -175,14 +175,18 @@ resulting official totals and the families that actually reach official
 
 \input{tables/provider_full54_summary}
 
-The full sweeps show why the short screen is not enough. In our local evidence,
-\texttt{gpt-5.2} exceeds \texttt{gpt-5-chat} on both official fields and
-activates a much broader family
+The full sweeps show why the short screen is not enough. In this local run,
+\texttt{gpt-5.2} records higher official \processmetric and \resultmetric
+totals than \texttt{gpt-5-chat}, and it activates a much broader family
 footprint, including \texttt{FunASR}, \texttt{InvisibleWatermark},
 \texttt{NeuroKit}, \texttt{SpeechBrain}, \texttt{Stegano},
 \texttt{StyleTransfer}, and \texttt{TransparentBackground}. Some of these
 families are dark or only partially active for \texttt{gpt-5-chat} on the full
-benchmark. \texttt{Gemini-2.5-Pro}, by contrast, remains narrow and lands on an
+benchmark. By contrast, \texttt{gpt-5-chat} remains concentrated in office,
+security, web, and one image family, with official-success families limited to
+\texttt{Eparse}, \texttt{Faker}, \texttt{PDFPlumber}, \texttt{PyPDF2},
+\texttt{Scrapy}, \texttt{SuperResolution}, and \texttt{Trafilatura}.
+\texttt{Gemini-2.5-Pro}, by contrast, remains narrow and lands on an
 office/security footprint centered on \texttt{Faker} and \texttt{PyPDF2}.
 
 The family-level changes are informative in both directions. The targeted
@@ -195,7 +199,9 @@ official success in \texttt{FunASR}, \texttt{Stegano},
 \texttt{StyleTransfer}, and \texttt{TransparentBackground}, while
 \texttt{Gemini-2.5-Pro}'s only full-benchmark official-success families are
 \texttt{Faker} and \texttt{PyPDF2} rather than the screen's single
-\texttt{PDFPlumber} success.
+\texttt{PDFPlumber} success. That family shift is small in absolute terms, but
+it reinforces the paper's narrower point that provider coverage does not behave
+like one homogeneous control condition.
 
 This is the clearest reason not to treat a targeted provider slice as a hidden
 replacement leaderboard. A short screen can reveal that a family is reachable
