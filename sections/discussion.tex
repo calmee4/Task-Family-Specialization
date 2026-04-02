@@ -1,8 +1,8 @@
 \section{Discussion}
 
-\subsection{What Should Be Reported}
+\subsection{Reporting Implications}
 
-Our evidence supports three reporting recommendations for repo-grounded agent
+Our evidence supports three low-cost reporting choices for repo-grounded agent
 benchmarks.
 \begin{enumerate}[leftmargin=1.25em]
 \item Report the benchmark's official \processmetric and \resultmetric fields
@@ -15,10 +15,10 @@ separately whenever both are available, so readers can distinguish
 aggregate pass counts.
 \end{enumerate}
 
-These recommendations are conservative: evaluators should expose existing
+These choices are conservative: benchmark papers should expose existing
 official structure rather than hide it behind one number.
 
-\subsection{A Minimal Reporting Standard}
+\subsection{A Minimal Report Structure}
 
 The paper's practical recommendation can be made more concrete. A minimal
 repo-grounded benchmark table should contain at least four pieces of
@@ -27,8 +27,8 @@ provides a compact benchmark headline. Second, the same table or a companion
 figure should report family or domain slices, so the reader can see where the
 success mass actually lands. Third, the paper should expose at least a small
 sample of official \processmetric$=$True, \resultmetric$=$False comments from
-the families that dominate that regime. Fourth, any separate targeted subset,
-such as our provider cohort, should be labeled explicitly as a supplementary analysis
+rather than as part of the benchmark-wide cohort. Fourth, any separate
+targeted subset, such as our provider cohort, should be labeled explicitly as a supplementary analysis
 rather than silently merged into the main benchmark cohort.
 
 This standard is intentionally lightweight. It does not require trajectory

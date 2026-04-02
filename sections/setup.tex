@@ -21,10 +21,12 @@ Our reported aggregates therefore obey two rules. First, the benchmark-facing
 numbers are always the official \processmetric and \resultmetric outputs.
 Second, any rates, domain summaries, or heatmaps reported in the paper are
 derived only by aggregating those official outputs.
-All reported cohorts use the same benchmark prompt/context bundle and the same
-single-agent code-generation loop. Each task allows at most two
-generation/repair attempts, each attempt is capped at 2600 completion tokens,
-and generated solve scripts run under a 240\,s timeout before official grading.
+All reported cohorts use GitTaskBench commit \texttt{df188a7}, the same
+benchmark prompt/context bundle, and the same single-agent code-generation
+loop. Generation is deterministic throughout the study: temperature is fixed at
+\texttt{0.0}, each task allows at most two generation/repair attempts, each
+attempt is capped at 2600 completion tokens, and generated solve scripts run
+under a 240\,s timeout before official grading.
 
 We also interpret \processmetric conservatively. In this paper,
 \processmetric$=$True means that the trace advanced far enough to receive an
