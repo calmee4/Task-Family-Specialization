@@ -175,14 +175,14 @@ resulting official totals and the families that actually reach official
 
 \input{tables/provider_full54_summary}
 
-The full sweeps show why the short screen is not enough. \texttt{gpt-5.2}
-expands rather than contracts on the full benchmark: it exceeds
-\texttt{gpt-5-chat} on both official fields and activates a much broader family
+The full sweeps show why the short screen is not enough. In our local evidence,
+\texttt{gpt-5.2} exceeds \texttt{gpt-5-chat} on both official fields and
+activates a much broader family
 footprint, including \texttt{FunASR}, \texttt{InvisibleWatermark},
 \texttt{NeuroKit}, \texttt{SpeechBrain}, \texttt{Stegano},
 \texttt{StyleTransfer}, and \texttt{TransparentBackground}. Some of these
 families are dark or only partially active for \texttt{gpt-5-chat} on the full
-benchmark. \texttt{Gemini-2.5-Pro}, by contrast, contracts to a narrow
+benchmark. \texttt{Gemini-2.5-Pro}, by contrast, remains narrow and lands on an
 office/security footprint centered on \texttt{Faker} and \texttt{PyPDF2}.
 
 The family-level changes are informative in both directions. The targeted
