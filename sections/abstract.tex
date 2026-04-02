@@ -1,25 +1,18 @@
 Agent benchmarks for repository-grounded tasks are typically reduced to a
-single global success rate, which can obscure where models actually succeed or
-fail. We argue that richer structure is already available in existing benchmark
-outputs without requiring new metrics or judges. Using \gittaskbench as a case
-study, we audit its official \processmetric/\resultmetric split---where
-\processmetric marks whether a trace reaches grading and \resultmetric marks
-whether it satisfies the task criterion---across a comparable open-model cohort,
-supplementary provider-model screens, and full-benchmark provider sweeps. Four
-empirical patterns emerge. First, official success is narrow and domain-skewed:
-observed \resultmetric mass concentrates in office-document, security, web, and
-speech families, while image and video families produce no observed success.
-Second, models that tie on global \resultmetric totals succeed on materially
-different task families, revealing hidden specialization that a single score
-cannot surface. Third, provider models do not form one uniform control
-condition: on the same benchmark tasks, \texttt{gpt-5-chat},
-\texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro} activate different families, and
-targeted screens can both overstate and miss activations that appear only in
-full-benchmark sweeps. Fourth, the intermediate
-\processmetric$=$True, \resultmetric$=$False regime is not random residue; it
-clusters in structured-extraction families and mixes threshold misses, parser
-failures, and evaluation-side errors. These findings support a practical
-reporting recommendation: repo-grounded agent evaluations should report the
-official \processmetric/\resultmetric split and family-level slices alongside
-any global pass rate, so that future method improvements can be attributed to
-specific capability gains rather than opaque score movements.
+single global success rate, yet richer structure already exists in their
+official outputs. Using \gittaskbench as a case study, we audit its official
+\processmetric/\resultmetric split---where \processmetric marks whether a trace
+reaches grading and \resultmetric marks whether it satisfies the task
+criterion---across a comparable open-model cohort and supplementary
+provider-model evaluations. Four patterns emerge. First, official success is
+narrow and domain-skewed, concentrating in office-document, security, web, and
+speech families while image and video produce none. Second, models that tie on
+global totals succeed on different task families, revealing hidden
+specialization. Third, provider models do not form one uniform control
+condition: they activate different families, and targeted screens can both
+overstate and miss activations found in full-benchmark sweeps. Fourth, the
+intermediate \processmetric$=$True, \resultmetric$=$False regime clusters in
+structured-extraction families rather than appearing as random residue. These
+findings recommend that repo-grounded evaluations report the official
+\processmetric/\resultmetric split and family-level slices alongside any global
+pass rate.
