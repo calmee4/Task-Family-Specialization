@@ -1,29 +1,25 @@
-Agent benchmarks are often summarized with a single success rate per model, but
-repository-grounded tasks already expose a richer official distinction between
-reaching the benchmark's grading stage and actually satisfying the task
-criterion. We study that distinction in \gittaskbench using only the
-benchmark's official \processmetric/\resultmetric outputs. Our main cohort is a
-same-harness open-model sweep over the full official task set. We supplement it
-with a shared-task \texttt{Trafilatura\_01/02} slice that extends coverage to
-provider models including \texttt{gpt-5.2} and \texttt{Gemini-2.5-Pro}, a
-targeted provider screen across
-\texttt{gpt-5-chat}, \texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro}, and one
-set of full-benchmark provider sweeps for the same three models. Three empirical patterns emerge. First,
-official \resultmetric success is narrow and domain-skewed: in the comparable
-cohort, all observed \resultmetric mass lies in office, security, web, and
-speech families, while image and video families are complete zeros. Second,
-tied headline scores hide family-specific competence: the three headline
-leaders in the comparable cohort tie on official \resultmetric success, but
-they do so on materially different task families. The provider screen further
-shows that broader frontier coverage
-does not behave like one uniform control condition, and the full-benchmark
-provider sweeps show that short screens can both overstate robustness and miss
-where provider gains actually land. Third, official
-\processmetric$=$True,
-\resultmetric$=$False rows are not uniformly distributed; they cluster in
-structured extraction families such as \texttt{Eparse}, \texttt{PDFPlumber},
-\texttt{Scrapy}, and \texttt{NeuroKit}. These findings support a narrow
-measurement claim: repo-grounded agent evaluation should report the benchmark's
-official \processmetric/\resultmetric split and family-level slices, not only a
-single global pass rate. This is a descriptive benchmark study rather than a
-public-leaderboard or frontier-ranking paper.
+Agent benchmarks for repository-grounded tasks are typically reduced to a
+single global success rate, which can obscure where models actually succeed or
+fail. We argue that richer structure is already available in existing benchmark
+outputs without requiring new metrics or judges. Using \gittaskbench as a case
+study, we audit its official \processmetric/\resultmetric split---where
+\processmetric marks whether a trace reaches grading and \resultmetric marks
+whether it satisfies the task criterion---across a comparable open-model cohort,
+supplementary provider-model screens, and full-benchmark provider sweeps. Four
+empirical patterns emerge. First, official success is narrow and domain-skewed:
+observed \resultmetric mass concentrates in office-document, security, web, and
+speech families, while image and video families produce no observed success.
+Second, models that tie on global \resultmetric totals succeed on materially
+different task families, revealing hidden specialization that a single score
+cannot surface. Third, provider models do not form one uniform control
+condition: on the same benchmark tasks, \texttt{gpt-5-chat},
+\texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro} activate different families, and
+targeted screens can both overstate and miss activations that appear only in
+full-benchmark sweeps. Fourth, the intermediate
+\processmetric$=$True, \resultmetric$=$False regime is not random residue; it
+clusters in structured-extraction families and mixes threshold misses, parser
+failures, and evaluation-side errors. These findings support a practical
+reporting recommendation: repo-grounded agent evaluations should report the
+official \processmetric/\resultmetric split and family-level slices alongside
+any global pass rate, so that future method improvements can be attributed to
+specific capability gains rather than opaque score movements.
