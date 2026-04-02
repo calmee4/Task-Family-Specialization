@@ -12,6 +12,11 @@
 \usepackage{xspace}
 \usepackage{url}
 
+% Allow line breaks at hyphens inside \texttt
+\renewcommand{\texttt}[1]{%
+  \begingroup\ttfamily\hyphenchar\font=`\-\relax #1\endgroup
+}
+
 \newcommand{\gittaskbench}{GitTaskBench\xspace}
 \newcommand{\processmetric}{\texttt{Process}\xspace}
 \newcommand{\resultmetric}{\texttt{Result}\xspace}

@@ -40,12 +40,19 @@ share a lesson directly relevant to our setting: when a benchmark's evaluation
 pipeline already distinguishes intermediate states, collapsing them into one
 number discards diagnostically useful information.
 
-\paragraph{Reporting-oriented evaluation frameworks.}
-Evaluation infrastructures have also argued for richer reporting. \texttt{HELM}
+\paragraph{Reporting-oriented evaluation and benchmark integrity.}
+Evaluation infrastructures have argued for richer reporting. \texttt{HELM}
 emphasizes standardized multi-scenario and multi-metric tables \cite{helm};
 \texttt{Dynabench} argues that benchmarks must remain informative as models
 saturate static test sets \cite{dynabench}; and \texttt{WildBench} pushes
 evaluation toward harder user-originated task distributions \cite{wildbench}.
+Recent work further extends this concern to agent-specific settings:
+\texttt{MAPS} examines the structural integrity of multilingual agent
+benchmarks \cite{maps}, \texttt{ConVerse} stresses the need for comprehensive
+safety evaluation beyond global pass rates in agent-to-agent interactions
+\cite{converse}, and \texttt{DebateQA} argues that evaluation metrics should
+reflect the nuanced structure of the task space rather than collapsing it into
+one scalar \cite{debateqa}.
 Our work shares the same instinct applied to a specific benchmark: once
 \gittaskbench already exposes separable success conditions through its official
 \processmetric/\resultmetric fields, reporting should preserve that separation.
