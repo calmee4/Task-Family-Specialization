@@ -1,62 +1,51 @@
 \section{Related Work}
 
-\paragraph{Agent benchmarks across environments.}
-Modern agent evaluation now spans text environments, general task suites, web
-interaction, enterprise work, mobile control, software engineering, and tool
-use
-\cite{scienceworld,agentbench,agentboard,webarena,visualwebarena,workarena,androidworld,toolgym,taubench,deepresearchbench,mcpbench,mcpuniverse}.
-General-assistant and computer-use benchmarks such as \texttt{GAIA} and
-\texttt{OSWorld} broaden the picture further by mixing web use, tool use, and
-open-ended computer interaction under more general assistant settings
-\cite{gaia,osworld}.
-Repository-grounded software tasks are especially relevant for our setting
-because they require understanding fixed external codebases rather than solving
-pure language problems in-context. \gittaskbench joins a growing ecosystem that
-includes \texttt{SWE-bench}, \texttt{SWE-agent}, \texttt{SWE-Lancer},
-\texttt{Ambig-SWE}, and long software-task evaluations
-\cite{swebench,sweagent,swelancer,ambigswe,longsoftwaretasks}. Our focus is
-narrower: how one such benchmark should be reported once official outputs have
-already been produced.
+\paragraph{Repository-grounded agent benchmarks.}
+Repository-grounded agent evaluation has grown into a substantial ecosystem.
+\texttt{SWE-bench} and \texttt{SWE-agent} test issue-resolution on real GitHub
+repositories \cite{swebench,sweagent}; \texttt{SWE-Lancer} and
+\texttt{Ambig-SWE} extend that setting to freelance-style and ambiguous
+specifications \cite{swelancer,ambigswe}; and long software-task evaluations
+stress sustained multi-step execution \cite{longsoftwaretasks}. Broader agent
+benchmarks span web interaction \cite{webarena,visualwebarena}, mobile control
+\cite{androidworld}, enterprise work \cite{workarena,taubench},
+general-assistant settings \cite{gaia,osworld}, and tool use
+\cite{agentbench,agentboard,toolgym,deepresearchbench,mcpbench,mcpuniverse}.
+\gittaskbench \cite{gittaskbench} belongs to the repository-grounded family but
+covers a wider range of task domains---including office-document extraction, web
+scraping, image processing, and speech---each graded by its own evaluator
+script. Our paper does not introduce a competing benchmark; it studies how
+\gittaskbench's existing official outputs should be reported.
 
 \paragraph{Trajectory diagnosis and post-hoc analysis.}
-Several recent works argue that final success alone is insufficient for
+A complementary line of work argues that final success alone is insufficient for
 understanding agent behavior. \texttt{AgentRx} diagnoses agent failures from
-execution trajectories, while \texttt{TRAJEVAL} decomposes code-agent traces
-into more granular failure modes \cite{agentrx,trajeval}. Those works motivate a
-general diagnostic mindset. Our contribution is narrower: even before manual
-trajectory analysis, the benchmark's own official \processmetric/\resultmetric
-split already reveals useful structure.
+execution trajectories \cite{agentrx}, and \texttt{TRAJEVAL} decomposes
+code-agent traces into granular failure modes \cite{trajeval}. These approaches
+require access to full execution logs and manual or model-based annotation. Our
+starting point is earlier in the analysis pipeline: the benchmark's own official
+\processmetric/\resultmetric split already reveals reportable structure before
+any trajectory-level inspection begins.
 
-\paragraph{Measurement blind spots in long-context evaluation.}
-Long-context work has repeatedly shown that aggregate scores can hide meaningful
-failure structure. Relevant examples include middle-position forgetting,
-benchmark family variation, and evaluation beyond literal matching
-\cite{lostmiddle,longbench,ruler,infinitebench,nolima,loogle}. We cite this
-literature not because \gittaskbench is a long-context benchmark, but because it
-establishes a broader measurement lesson: when a benchmark score collapses
-multiple conditions of success, reporting only the aggregate can be misleading.
+\paragraph{Measurement lessons from adjacent evaluation fields.}
+The concern that aggregate scores hide meaningful failure structure is not
+unique to agent evaluation. Long-context research has shown that
+middle-position forgetting, benchmark family variation, and evaluation
+granularity all affect what an aggregate score actually measures
+\cite{lostmiddle,longbench,ruler,infinitebench,nolima,loogle}. Multimodal
+benchmarks have independently demonstrated that answer-channel design,
+extraction quality, and thresholded criteria can shift reported outcomes
+substantially \cite{mme,mmmu,mathvista,hallusionbench,blink}. Both literatures
+share a lesson directly relevant to our setting: when a benchmark's evaluation
+pipeline already distinguishes intermediate states, collapsing them into one
+number discards diagnostically useful information.
 
 \paragraph{Reporting-oriented evaluation frameworks.}
-Adjacent evaluation infrastructures have also argued that benchmark reports
-should preserve more structure than one scalar score. \texttt{HELM} emphasizes
-standardized multi-scenario and multi-metric reporting, while
-\texttt{Dynabench} argues that benchmarks must stay informative even as models
-quickly saturate static test sets, and \texttt{WildBench} pushes evaluation
-toward harder user-originated task distributions
-\cite{helm,dynabench,wildbench}. Our paper does not propose a new evaluation
-platform, but it shares the same reporting instinct: once a benchmark already
-exposes separable success conditions, collapsing them into one headline number
-throws away evidence the evaluator has already provided.
-
-\paragraph{Multimodal benchmarking and answer-channel sensitivity.}
-Multimodal evaluation has also highlighted that benchmark outcomes depend on
-what is being measured and how answers are extracted or judged. Representative
-examples include \texttt{MME}, \texttt{MMMU}, \texttt{MathVista},
-\texttt{HallusionBench}, and \texttt{BLINK} \cite{mme,mmmu,mathvista,hallusionbench,blink}.
-The connection to our work is again methodological. Structured outputs,
-thresholded criteria, and answer-channel validity matter in multimodal
-benchmarks; they also matter in repository-grounded software tasks.
-
-\paragraph{Positioning.}
-This paper is a descriptive benchmark analysis of repo-grounded agent
-evaluation built entirely on \gittaskbench's existing official metrics.
+Evaluation infrastructures have also argued for richer reporting. \texttt{HELM}
+emphasizes standardized multi-scenario and multi-metric tables \cite{helm};
+\texttt{Dynabench} argues that benchmarks must remain informative as models
+saturate static test sets \cite{dynabench}; and \texttt{WildBench} pushes
+evaluation toward harder user-originated task distributions \cite{wildbench}.
+Our work shares the same instinct applied to a specific benchmark: once
+\gittaskbench already exposes separable success conditions through its official
+\processmetric/\resultmetric fields, reporting should preserve that separation.
