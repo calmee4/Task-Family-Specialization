@@ -15,9 +15,8 @@ separately whenever both are available, so readers can distinguish
 aggregate pass counts.
 \end{enumerate}
 
-These recommendations are intentionally conservative. We do not ask benchmark
-authors to redesign their official metric. We ask evaluators to stop hiding
-existing official structure behind one number.
+These recommendations are conservative: evaluators should expose existing
+official structure rather than hide it behind one number.
 
 \subsection{A Minimal Reporting Standard}
 
@@ -37,6 +36,29 @@ annotation, human judges, or new benchmark infrastructure. It only requires
 authors to preserve and report structure that the benchmark already emits. That
 is why we view the proposal as realistic. It is closer to better bookkeeping
 than to a new evaluation methodology.
+
+\subsection{Benchmark-Design Implications}
+
+The reporting claim also has a benchmark-design implication. If a benchmark
+provides family labels, evaluator comments, and intermediate states such as
+\processmetric$=$True, \resultmetric$=$False, then future releases should treat
+those fields as first-class outputs rather than as debugging residue. The same
+benchmark can still keep one compact leaderboard score, but the artifact bundle
+should make it easy for papers to recover family slices and the clustered
+graded-but-unsuccessful regime without manual relabeling. This is consistent
+with broader evaluation frameworks such as \texttt{HELM} and
+\texttt{Dynabench}, which argue that benchmark reports should preserve richer
+structure than one scalar headline \cite{helm,dynabench}.
+
+Our results also suggest a practical split between benchmark-wide evaluation and
+targeted stress slices. Benchmark-wide cohorts remain the only defensible basis
+for claims about family concentration and robustness. Targeted slices are still
+valuable, but they should be framed as probes: they can show that a family
+activates at all, that a zero is not absolute, or that one model class reaches a
+different intermediate regime. What they should not do is silently replace the
+benchmark-wide cohort. That distinction is especially important for
+repo-grounded agents, where individual families can differ sharply in external
+dependencies, artifact formats, and evaluator thresholds.
 
 \subsection{Providers Are Not One Control Condition}
 

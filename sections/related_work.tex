@@ -1,14 +1,20 @@
 \section{Related Work}
 
 \paragraph{Agent benchmarks across environments.}
-Modern agent evaluation now spans general task suites, web interaction, mobile
-control, software engineering, and tool use
-\cite{agentbench,webarena,visualwebarena,androidworld,toolgym,deepresearchbench,mcpbench,mcpuniverse}.
+Modern agent evaluation now spans text environments, general task suites, web
+interaction, enterprise work, mobile control, software engineering, and tool
+use
+\cite{scienceworld,agentbench,agentboard,webarena,visualwebarena,workarena,androidworld,toolgym,taubench,deepresearchbench,mcpbench,mcpuniverse}.
+General-assistant and computer-use benchmarks such as \texttt{GAIA} and
+\texttt{OSWorld} broaden the picture further by mixing web use, tool use, and
+open-ended computer interaction under more general assistant settings
+\cite{gaia,osworld}.
 Repository-grounded software tasks are especially relevant for our setting
 because they require understanding fixed external codebases rather than solving
 pure language problems in-context. \gittaskbench joins a growing ecosystem that
-includes \texttt{SWE-bench}, \texttt{SWE-Lancer}, \texttt{Ambig-SWE}, and long
-software-task evaluations \cite{swebench,swelancer,ambigswe,longsoftwaretasks}.
+includes \texttt{SWE-bench}, \texttt{SWE-agent}, \texttt{SWE-Lancer},
+\texttt{Ambig-SWE}, and long software-task evaluations
+\cite{swebench,sweagent,swelancer,ambigswe,longsoftwaretasks}.
 Our paper does not compete with these benchmarks. It studies how one such
 benchmark should be reported once official outputs have already been produced.
 
@@ -29,6 +35,18 @@ benchmark family variation, and evaluation beyond literal matching
 literature not because \gittaskbench is a long-context benchmark, but because it
 establishes a broader measurement lesson: when a benchmark score collapses
 multiple conditions of success, reporting only the aggregate can be misleading.
+
+\paragraph{Reporting-oriented evaluation frameworks.}
+Adjacent evaluation infrastructures have also argued that benchmark reports
+should preserve more structure than one scalar score. \texttt{HELM} emphasizes
+standardized multi-scenario and multi-metric reporting, while
+\texttt{Dynabench} argues that benchmarks must stay informative even as models
+quickly saturate static test sets, and \texttt{WildBench} pushes evaluation
+toward harder user-originated task distributions
+\cite{helm,dynabench,wildbench}. Our paper does not propose a new evaluation
+platform, but it shares the same reporting instinct: once a benchmark already
+exposes separable success conditions, collapsing them into one headline number
+throws away evidence the evaluator has already provided.
 
 \paragraph{Multimodal benchmarking and answer-channel sensitivity.}
 Multimodal evaluation has also highlighted that benchmark outcomes depend on
