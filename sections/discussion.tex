@@ -64,19 +64,19 @@ dependencies, artifact formats, and evaluator thresholds.
 
 The targeted provider screen adds one more practical lesson. Papers often
 use one strong provider model as a qualitative control and then discuss ``closed
-models'' as if they formed one stable reference class. Our local evidence does
-not support that shortcut. On the same targeted GitTaskBench slice, \texttt{gpt-5-chat},
+models'' as if they formed one stable reference class. Our evidence does not
+support that shortcut. On the same targeted GitTaskBench slice, \texttt{gpt-5-chat},
 \texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro} occupy very different parts of the
 \processmetric/\resultmetric space. This does not prove a frontier ranking, but
-it does show that provider breadth matters even for a conservative measurement
-note. One provider model can light up \texttt{Scrapy} or \texttt{NeuroKit}
+it does show that provider breadth matters even for a conservative benchmark
+study. One provider model can light up \texttt{Scrapy} or \texttt{NeuroKit}
 while another barely reaches grading outside \texttt{PDFPlumber}.
 
 That observation interacts directly with how open-model comparisons are read.
 When an open-model cohort records zero official \resultmetric success on some
 family, the next question should not be ``can one cherry-picked provider model
 solve it?'' The more useful question is whether the family activates
-consistently across a broader model class. In our local evidence,
+consistently across a broader model class. In the present study,
 \texttt{NeuroKit} and \texttt{Scrapy} move under both GPT-family models, while
 the targeted image and video stressors in that screen stay dark. This is
 exactly why we recommend reporting family slices rather than only one total or
@@ -88,8 +88,8 @@ The separate full-benchmark provider sweeps add a second lesson. A
 targeted screen is good at finding activation points, but it can be optimistic
 about how stable those activations are once the full benchmark distribution is
 restored. The three full sweeps do not collapse into one provider story.
-\texttt{gpt-5.2} shows materially broader full-benchmark coverage in our local
-evidence, adding speech, physiological-signal, security, and image families
+\texttt{gpt-5.2} shows materially broader full-benchmark coverage in the
+evaluated sweeps, adding speech, physiological-signal, security, and image families
 that are dark or only partially active for \texttt{gpt-5-chat}, while
 \texttt{Gemini-2.5-Pro} stays
 narrow and mostly office/security. Even within the GPT family, the full sweeps
@@ -117,7 +117,7 @@ apparent gain may come from improving just one structured family, from making
 more traces gradeable without improving their final correctness, or from moving
 one domain while leaving other domains unchanged.
 
-Our measurement note does not resolve those ambiguities. It makes them visible.
+This paper does not resolve those ambiguities. It makes them visible.
 That is the right scope for the current evidence. The benchmark already tells us
 more than most papers currently report, and that extra information becomes more
 important as agent papers become more incremental. Once multiple papers begin to
@@ -152,16 +152,15 @@ of trajectory-level analysis.
 
 \subsection{Limitations}
 
-The paper has clear limits. First, the main evidence is local-run rather than a
-synchronized scrape of the public \gittaskbench leaderboard. Second, broader
-frontier API coverage currently exists only on the small shared
-\texttt{Trafilatura} slice, where we keep the latest local run per model-task
-pair rather than a synchronized same-day rerun. Third, some
-\processmetric$=$False mass may still reflect local harness brittleness rather
-than pure model weakness. Some \processmetric$=$True,
-\resultmetric$=$False rows also include evaluation-side errors rather than pure
-threshold misses. For these reasons, we present the paper as a measurement note,
-not as a universal scaling law.
+The paper has clear limits. First, the main evidence is a fixed study cohort
+rather than a synchronized scrape of the public \gittaskbench leaderboard.
+Second, broader provider coverage currently exists only on the small shared
+\texttt{Trafilatura} slice, which is aligned by task but not intended as a
+synchronized same-day rerun. Third, some \processmetric$=$False mass may still
+reflect harness-specific brittleness rather than pure model weakness. Some
+\processmetric$=$True, \resultmetric$=$False rows also include evaluation-side
+errors rather than pure threshold misses. For these reasons, we present the
+paper as a descriptive benchmark analysis, not as a universal scaling law.
 
 \subsection{How This Connects to Richer Agent Analysis}
 

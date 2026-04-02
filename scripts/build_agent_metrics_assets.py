@@ -139,7 +139,7 @@ def build_model_summary_table(rows):
     )
     lines = [
         "\\begin{table}[t]",
-        "\\caption{Comparable local open-model cohort on the full official GitTaskBench task roster. Process and Result are counts of official \\processmetric$=$True and \\resultmetric$=$True rows per model.}",
+        "\\caption{Comparable open-model cohort on the full official GitTaskBench task roster. Process and Result are counts of official \\processmetric$=$True and \\resultmetric$=$True rows per model.}",
         "\\label{tab:model-summary}",
         "\\centering",
         "\\small",
@@ -170,7 +170,7 @@ def build_domain_table(row_records):
 
     lines = [
         "\\begin{table}[t]",
-        "\\caption{Comparable local cohort summarized by a fixed family-to-domain map. Process and Result are paper-side aggregates of official \\processmetric$=$True and \\resultmetric$=$True rows.}",
+        "\\caption{Comparable cohort summarized by a fixed family-to-domain map. Process and Result are paper-side aggregates of official \\processmetric$=$True and \\resultmetric$=$True rows.}",
         "\\label{tab:domain-summary}",
         "\\centering",
         "\\small",
@@ -199,7 +199,7 @@ def build_shared_table(rows):
 
     lines = [
         "\\begin{table}[t]",
-        "\\caption{Latest local runs on shared benchmark tasks \\texttt{Trafilatura\\_01} and \\texttt{Trafilatura\\_02} across open and provider models. Each cell reports the benchmark's official \\processmetric/\\resultmetric pair for that task.}",
+        "\\caption{Shared benchmark tasks \\texttt{Trafilatura\\_01} and \\texttt{Trafilatura\\_02} across open and provider models. Each cell reports the benchmark's official \\processmetric/\\resultmetric pair for that task.}",
         "\\label{tab:shared-trafilatura}",
         "\\centering",
         "\\small",
@@ -232,7 +232,7 @@ def build_provider_screen_table(model_rows):
 
     lines = [
         "\\begin{table}[t]",
-        "\\caption{Targeted provider robustness screen covering the main success-bearing families, the main graded-but-unsuccessful families, and one image/video stress check. Reported separately from the comparable local cohort; listed families contain at least one official \\resultmetric$=$True row.}",
+        "\\caption{Targeted provider robustness screen covering the main success-bearing families, the main graded-but-unsuccessful families, and one image/video stress check. Reported separately from the comparable cohort; listed families contain at least one official \\resultmetric$=$True row.}",
         "\\label{tab:provider-screen}",
         "\\centering",
         "\\small",
@@ -275,7 +275,7 @@ def build_provider_full54_summary_table(model_rows):
 
     lines = [
         "\\begin{table}[t]",
-        "\\caption{Supplementary full-benchmark provider sweeps under the same local GitTaskBench setup. Listed families contain at least one official \\resultmetric$=$True row.}",
+        "\\caption{Supplementary full-benchmark provider sweeps under the same GitTaskBench evaluation protocol. Listed families contain at least one official \\resultmetric$=$True row.}",
         "\\label{tab:provider-full54-summary}",
         "\\centering",
         "\\scriptsize",
@@ -330,7 +330,7 @@ def plot_model_summary(rows):
     ax.set_xlim(0, 10)
     ax.grid(axis="x", linestyle="--", alpha=0.3)
     ax.legend(frameon=False, loc="lower right")
-    ax.set_title("Comparable local cohort under GitTaskBench official metrics")
+    ax.set_title("Comparable open-model cohort under GitTaskBench official metrics")
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     for idx, value in enumerate(process):

@@ -30,31 +30,32 @@ task criterion. Some traces never reach grading; others reach grading but still
 fail. If both cases are collapsed into a single final success rate, important
 structure disappears.
 
-The empirical design stays deliberately traceable. The main cohort is a local
-comparable open-model sweep on \gittaskbench. We then add a smaller
+The empirical design stays deliberately simple. The main cohort is a comparable
+open-model sweep on \gittaskbench. We then add a smaller
 \texttt{Trafilatura\_01/02} slice on web-extraction tasks that extends coverage
-to locally available provider models, including \texttt{gpt-5.2} and
-\texttt{Gemini-2.5-Pro}. We also add a targeted provider screen on
+to provider models, including \texttt{gpt-5.2} and \texttt{Gemini-2.5-Pro}. We
+also add a targeted provider screen on
 \texttt{gpt-5-chat}, \texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro} so the paper
 does not reduce to a purely within-open-model comparison. For the shared-task
-slice, we keep the latest local run per model-task pair. All plots and tables
-aggregate only the benchmark's official \processmetric and \resultmetric
-outputs. Derived rates and heatmaps are marked as paper-side summaries rather
-than as new benchmark metrics. Finally, we add full-benchmark provider sweeps
-for \texttt{gpt-5-chat}, \texttt{gpt-5.2}, and
-\texttt{Gemini-2.5-Pro} to test whether the targeted screen remains
-representative once the full benchmark distribution is restored.
+slice, we align identical benchmark tasks across models without treating that
+slice as a same-day frontier ranking. All plots and tables aggregate only the
+benchmark's official \processmetric and \resultmetric outputs. Derived rates
+and heatmaps are marked as paper-side summaries rather than as new benchmark
+metrics. Finally, we add full-benchmark provider sweeps for
+\texttt{gpt-5-chat}, \texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro} to test
+whether the targeted screen remains representative once the full benchmark
+distribution is restored.
 
-The evidence hierarchy is intentional. The comparable local cohort is the
+The evidence hierarchy is intentional. The comparable cohort is the
 paper's primary evidence. The targeted provider screen and the full-benchmark
 provider sweeps are separate robustness checks, and the shared
 \texttt{Trafilatura} slice is used only as a cross-model existence proof.
 
 Three findings motivate the paper. First, official success is narrow and
-domain-skewed. In the comparable local cohort, all observed \resultmetric mass
+domain-skewed. In the comparable cohort, all observed \resultmetric mass
 lies in office, security, web, and speech families; image and video families
 are complete zeros. Second, tied headline totals hide family specialization.
-The three headline leaders in the comparable local cohort tie on official
+The three headline leaders in the comparable cohort tie on official
 \resultmetric success, but they succeed
 on different tasks and families. The targeted provider screen adds a second
 measurement point: broader frontier coverage changes which families activate,
@@ -71,16 +72,16 @@ evaluation-side errors after grading begins.
 
 The paper's claim is therefore narrower than ``leaderboards are wrong'' and
 narrower than a general law about agent evaluation. Our supported claim is
-simple. On a reproducible local \gittaskbench cohort, reporting only a single
-global \resultmetric rate hides family-specific competence and a structured
+simple. On the evaluated \gittaskbench cohorts, reporting only a single global
+\resultmetric rate hides family-specific competence and a structured
 \processmetric$=$True, \resultmetric$=$False regime already visible in the
 benchmark's own outputs.
 
 \paragraph{Contributions.}
 This paper makes four concrete contributions.
 \begin{enumerate}[leftmargin=1.25em]
-\item We construct a traceable official-metric audit of \gittaskbench over a
-comparable local cohort and a broader shared-task slice, while keeping the
+\item We construct an official-metric audit of \gittaskbench over a
+comparable open-model cohort and a broader shared-task slice, while keeping the
 benchmark's official \processmetric/\resultmetric contract fixed.
 \item We show that official \resultmetric success is highly concentrated in a
 small subset of domains and families rather than being smoothly distributed
@@ -93,9 +94,9 @@ explicitly in future repo-grounded evaluations.
 \end{enumerate}
 
 \paragraph{Scope and Epistemic Stance.}
-This paper is a development study on auditable local runs, not a synchronized
-public-leaderboard scrape. We report exact observed
-\processmetric/\resultmetric counts from those runs, and we use the provider
-slices as separate robustness checks rather than as claims about a stable
-frontier ranking. The resulting claims are descriptive and benchmark-facing,
-not inferential estimates over repeated random seeds.
+This paper is a descriptive benchmark study, not a synchronized public
+leaderboard scrape. We report exact observed \processmetric/\resultmetric
+counts from the evaluated cohorts, and we use the provider slices as separate
+robustness checks rather than as claims about a stable frontier ranking. The
+resulting claims are descriptive and benchmark-facing, not inferential
+estimates over repeated random seeds.

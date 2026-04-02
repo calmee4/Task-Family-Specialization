@@ -3,10 +3,11 @@
 \subsection{Global Totals Are Narrow and Domain-Skewed}
 
 Table~\ref{tab:model-summary} gives the exact official totals for the comparable
-local cohort. The raw totals are already modest: several leading models tie at
+cohort. The raw totals are already modest: several leading models tie at
 the top, while three models remain at zero on both official fields.
-Figure~\ref{fig:overview} adds the broader distributional picture. Official
-success is not spread evenly across the benchmark. In the comparable local
+Figure~\ref{fig:overview} shows the model-level official totals, while
+Table~\ref{tab:domain-summary} adds the broader distributional picture.
+Official success is not spread evenly across the benchmark. In the comparable
 cohort, office-document and security families contribute most of the observed
 \resultmetric success, web and speech contribute a smaller residue,
 physiological signals reach grading without \resultmetric success, and image
@@ -15,22 +16,12 @@ and video are complete zeros.
 \input{tables/model_summary}
 \input{tables/domain_summary}
 
-\begin{figure*}[t]
+\begin{figure}[t]
     \centering
-    \begin{subfigure}[t]{0.58\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{figures/figure_model_summary.pdf}
-        \caption{Comparable local official totals.}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[t]{0.38\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{figures/figure_domain_summary.pdf}
-        \caption{Paper-side summaries aggregated from official outputs.}
-    \end{subfigure}
-    \caption{Comparable local cohort under GitTaskBench official metrics. Global totals obscure the concentration of observed success in office, security, web, and speech, while image and video remain dark.}
+    \includegraphics[width=\columnwidth]{figures/figure_model_summary.pdf}
+    \caption{Comparable open-model official totals under GitTaskBench official metrics. Domain concentration is reported separately in Table~\ref{tab:domain-summary}.}
     \label{fig:overview}
-\end{figure*}
+\end{figure}
 
 This distribution matters because a single global score can suggest a smooth
 ordering that the domain slices do not support. In our cohort, different
@@ -45,7 +36,7 @@ with repeatable task completion, domains with gradeable-but-unsuccessful traces,
 and domains with no observed official traction at all.
 
 This point becomes stronger once we separate benchmark mass from success mass.
-Image tasks constitute the single largest domain block in the comparable local
+Image tasks constitute the single largest domain block in the comparable
 cohort, but
 they contribute nothing to observed official success. Office and security are
 much smaller by trace count than image plus video combined, yet they account for
@@ -54,9 +45,26 @@ tell the reader whether a model is weak everywhere, strong only on structured
 extraction, or simply facing a benchmark where most active success mass lives in
 just a few families.
 
+The same conclusion survives normalization by domain mass. Figure~\ref{fig:domain-rates}
+shows paper-side \processmetric and \resultmetric rates after aggregating the
+official outputs by fixed benchmark domain. Office and security still dominate
+after that normalization; web and speech retain a smaller but non-zero
+conversion band; physiological-signal tasks reach grading without converting to
+official success; and image plus video remain at zero. The point is not merely
+that some domains contain more traces. It is that the benchmark currently
+supports qualitatively different success regimes across domains even after
+accounting for how much evaluation mass each domain contributes.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/figure_domain_summary.pdf}
+    \caption{Paper-side domain rates aggregated from GitTaskBench official metrics. Office and security remain the main success-bearing domains after normalization by domain mass, while image and video stay at zero.}
+    \label{fig:domain-rates}
+\end{figure}
+
 \subsection{Tied Headline Scores Hide Family Specialization}
 
-The three headline leaders in the comparable local cohort tie on official
+The three headline leaders in the comparable cohort tie on official
 \resultmetric success, but the tied total is misleading. \texttt{Qwen2.5-14B}
 reaches official success in \texttt{Eparse}, \texttt{PDFPlumber}, and
 \texttt{Faker}. \texttt{Qwen2.5-32B} keeps those families and adds
@@ -71,7 +79,7 @@ for \texttt{Mistral-Small-24B}.
 \begin{figure}[t]
     \centering
     \includegraphics[width=\columnwidth]{figures/figure_task_heatmap.pdf}
-    \caption{Official \resultmetric task heatmap for all tasks with at least one observed success in the comparable local cohort. Several models tie globally, but they do not win on the same task set.}
+    \caption{Official \resultmetric task heatmap for all tasks with at least one observed success in the comparable cohort. Several models tie globally, but they do not win on the same task set.}
     \label{fig:task-heatmap}
 \end{figure}
 
@@ -89,16 +97,16 @@ failure surfaces, different benchmark coverage, and different places where a
 future method paper might appear to ``improve the agent'' simply by improving
 one narrow family.
 
-\subsection{The Local Evidence Already Extends Beyond Qwen}
+\subsection{The Evidence Already Extends Beyond Qwen}
 
-The comparable local cohort contains only one non-Qwen model with non-zero
+The comparable cohort contains only one non-Qwen model with non-zero
 official \resultmetric success: \texttt{Mistral-Small-24B}. Its wins are \texttt{Eparse\_02} and
 \texttt{Trafilatura\_03}. That is enough to prevent the main observation from
 reducing to a purely within-Qwen comparison, although same-task non-Qwen
 coverage remains limited. The shared-task \texttt{Trafilatura} slice extends
 the point further. Table~\ref{tab:shared-trafilatura} shows that
 \texttt{gpt-5.2} and \texttt{Gemini-2.5-Pro} both achieve official
-\processmetric$=$1, \resultmetric$=$1 on \texttt{Trafilatura\_02}. The local
+\processmetric$=$1, \resultmetric$=$1 on \texttt{Trafilatura\_02}. The main
 open-model cohort likewise contains a \texttt{Trafilatura\_01} success via
 \texttt{Qwen3-32B}. The point of the table is therefore existential rather than
 rank-based: official non-Qwen successes already appear once the same benchmark
@@ -106,10 +114,9 @@ tasks are aligned.
 
 \input{tables/shared_trafilatura}
 
-The shared-task slice is aligned by task but not synchronized as a frontier-wide
-rerun, so we treat it only as an existence proof rather than as a calibrated
+The shared-task slice is aligned by task but is not intended as a calibrated
 cross-model ranking. The supported claim is narrower: once the same official
-tasks are aligned, official non-Qwen successes already appear in local evidence.
+tasks are aligned, official non-Qwen successes already appear.
 
 \subsection{A Supplementary Provider Screen Changes The Active Families}
 
@@ -133,19 +140,19 @@ condition or a hidden replacement leaderboard.
 
 The family pattern is more informative than the totals. Both GPT-family models
 convert \texttt{Scrapy\_03} and \texttt{NeuroKit\_01} into official
-\resultmetric success, whereas the comparable local cohort had no official
+\resultmetric success, whereas the comparable cohort had no official
 \resultmetric-positive rows at all in \texttt{Scrapy} or \texttt{NeuroKit}.
 \texttt{gpt-5-chat} additionally reaches official success on
 \texttt{SpeechBrain\_05}; \texttt{gpt-5.2} does not. \texttt{Gemini-2.5-Pro},
 by contrast, activates only \texttt{PDFPlumber}. This is exactly the kind of
 structure that a single global pass rate would obscure. If we reported only one
 provider total, we would hide the fact that ``provider strength'' is itself
-family-selective in local evidence.
+family-selective in the present study.
 
-The provider screen also changes how we should read the local zeros. A zero in
-the comparable local cohort need not mean the family is inherently impossible under the
+The provider screen also changes how we should read the cohort zeros. A zero in
+the comparable cohort need not mean the family is inherently impossible under the
 benchmark's official metric. \texttt{NeuroKit} and \texttt{Scrapy} illustrate
-this clearly. In the comparable local cohort they contribute only to the
+this clearly. In the comparable cohort they contribute only to the
 \processmetric$=$True, \resultmetric$=$False regime or to complete failure. In
 the provider screen they become official \resultmetric-positive families for
 both GPT-family models. By contrast, the image and video stressors,
@@ -175,7 +182,7 @@ resulting official totals and the families that actually reach official
 
 \input{tables/provider_full54_summary}
 
-The full sweeps show why the short screen is not enough. In this local run,
+The full sweeps show why the short screen is not enough. In this study,
 \texttt{gpt-5.2} records higher official \processmetric and \resultmetric
 totals than \texttt{gpt-5-chat}, and it activates a much broader family
 footprint, including \texttt{FunASR}, \texttt{InvisibleWatermark},
@@ -210,7 +217,7 @@ swap across families, or disappear once the full task distribution is restored.
 
 \subsection{The \processmetric$=$True, \resultmetric$=$False Regime Clusters}
 
-The comparable local cohort contains a visible band of official
+The comparable cohort contains a visible band of official
 \processmetric$=$True and \resultmetric$=$False outcomes. These rows are not
 spread evenly across the benchmark. They cluster in \texttt{Eparse},
 \texttt{PDFPlumber}, \texttt{Scrapy}, and \texttt{NeuroKit}. The benchmark's

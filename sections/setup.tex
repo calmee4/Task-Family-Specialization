@@ -30,14 +30,14 @@ report parsing or evaluation errors after grading begins.
 
 \subsection{Cohorts}
 
-The main cohort is a comparable local open-model sweep over the full official
+The main cohort is a comparable open-model sweep over the full official
 \gittaskbench task set. Comparable here means that every model in this cohort
-is evaluated on the same benchmark task roster, through the same local
-GitTaskBench harness family, and against the same official evaluator contract.
-The paper-side totals are then computed from the emitted official rows rather
-than from hand relabeling.
+is evaluated on the same benchmark task roster, through the same agent harness
+family, and against the same official evaluator contract. The paper-side totals
+are then computed from the emitted official rows rather than from hand
+relabeling.
 
-The local open-model roster is:
+The open-model roster is:
 \begin{itemize}[leftmargin=1.25em]
 \item \texttt{Qwen2.5-7B},
 \item \texttt{Qwen2.5-14B},
@@ -50,44 +50,39 @@ The local open-model roster is:
 \end{itemize}
 
 To reduce Qwen-centric interpretation, we add a second cohort built from the
-latest local runs on shared tasks \texttt{Trafilatura\_01} and
-\texttt{Trafilatura\_02}. This slice expands the roster by adding
-\texttt{gpt-5.2} and \texttt{Gemini-2.5-Pro}.\footnote{For readability we use
-shortened provider labels in the paper. The exact raw identifiers in the
-released artifacts are \texttt{gpt-5-chat-2025-08-07},
-\texttt{gpt-5.2-2025-12-11}, and
-\texttt{gemini-2.5-pro-preview-06-05}.} The shared-task cohort is
-smaller, but it lets us check whether some official success patterns already
-extend beyond the open-model local sweep. Exact raw model identifiers are kept
-in the released CSV artifacts.
+shared tasks \texttt{Trafilatura\_01} and \texttt{Trafilatura\_02}. This slice
+expands the roster by adding \texttt{gpt-5.2} and
+\texttt{Gemini-2.5-Pro}. The shared-task cohort is smaller, but it lets us
+check whether some official success patterns already extend beyond the main
+open-model sweep.
 
-For the comparable local cohort, we use the full set of local manifests from
-the main GitTaskBench sweep. For the shared \texttt{Trafilatura} slice, we
-retain the latest local run available for each model-task pair. This gives
-broader model coverage, but it is not comparable in the same sense as the main
-cohort: it aligns exact benchmark tasks and the same official evaluator fields,
-while keeping the latest local run per model-task pair rather than a
-synchronized same-day frontier rerun.
+For the comparable cohort, each model is evaluated on the full benchmark task
+roster. For the shared \texttt{Trafilatura} slice, each model contributes one
+aligned run on the same benchmark tasks. This gives broader model coverage, but
+it is not comparable in the same sense as the main cohort: it aligns exact
+benchmark tasks and the same official evaluator fields, but it is used only as
+task-aligned cross-model evidence rather than as a synchronized frontier rerun.
 
 As a separate robustness check, we also complete one targeted provider
-screen for three locally available provider models:
+screen for three provider models:
 \texttt{gpt-5-chat}, \texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro}. The task
 set is intentionally small but structured. The selection rule is fixed rather
 than ad hoc: it includes the main success-bearing families from the comparable
-local cohort, the main \processmetric$=$True/\resultmetric$=$False families,
+cohort, the main \processmetric$=$True/\resultmetric$=$False families,
 and one image plus one video stressor. We report the screen separately rather
-than merging it into the comparable local totals because it is a targeted slice
+rather than merging it into the comparable totals because it is a targeted slice
 rather than a full-benchmark cohort.
 
 To test whether that targeted slice extrapolates, we also run
 \texttt{gpt-5-chat}, \texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro} over the
-full benchmark under the same local agent setup. We likewise report these runs
-separately from the comparable local cohort and from the targeted provider
+full benchmark under the same evaluation protocol. We likewise report these
+runs separately from the comparable cohort and from the targeted provider
 screen.
 
-These cohort choices set the paper's scope. This is a traceable local
-measurement note, not a synchronized scrape of the public \gittaskbench
-leaderboard and not a same-day frontier bakeoff.
+These cohort choices set the paper's scope. The paper studies benchmark-visible
+structure under a fixed evaluation protocol; it is not intended as a
+synchronized scrape of the public \gittaskbench leaderboard or as a same-day
+frontier bakeoff.
 
 \subsection{Aggregation Protocol}
 
@@ -111,11 +106,11 @@ That screen is deliberately curated toward the families that matter most for the
 current paper: the main success-bearing families, the main
 graded-but-unsuccessful families, and one image/video stress check. It is
 therefore useful as a robustness probe, but it is not a replacement for the
-comparable local cohort.
+comparable cohort.
 Mixing the two into one aggregate would create a reporting problem of its own:
 the same paper would conflate a benchmark-wide cohort with a targeted slice.
 That distinction matters even more once the provider screen is multi-model. The
-screen is useful for checking whether some local zeros disappear under a
+screen is useful for checking whether some cohort zeros disappear under a
 different model class, but it should not be mistaken for a replacement
 leaderboard.
 
@@ -132,23 +127,18 @@ recovering more structure than a single global pass rate.
 
 Finally, the protocol is intentionally asymmetric with respect to claims. Global
 totals can support only global claims. Family slices can support only family
-claims. Representative comments from official outputs can support only local
+claims. Representative comments from official outputs can support only scoped
 interpretations about the graded-but-unsuccessful regime. We use this asymmetry
-throughout the paper to keep the measurement note conservative.
+throughout the paper to keep the analysis conservative.
 
 We also report exact cohort totals rather than seed-averaged estimates. The
 current evidence therefore supports descriptive benchmark claims, not variance
 estimates or statistical-significance claims.
 
-\subsection{Artifacts and Reproducibility}
+\subsection{Analysis Pipeline}
 
-Experiment outputs are archived with launch metadata, run manifests, and
-exported CSV/JSON summaries. The paper includes the specific exported summaries
-used in the analysis under \texttt{data/}, and a companion asset-build script
-regenerates all tables and figures from those files.
-
-The evidence chain is explicit. Benchmark run manifests are first reduced to
-exported \processmetric/\resultmetric summaries. The paper then rebuilds its
-figures and tables from those exported summaries. This keeps the paper
-traceable to concrete benchmark outputs while avoiding ad hoc manual
-transcription.
+All tables and figures are regenerated from exported summaries of the official
+\processmetric/\resultmetric outputs. The analysis therefore does not rely on
+manual relabeling or manual transcription. Every paper-side rate, domain slice,
+or heatmap is a deterministic aggregation of the benchmark's own official
+outputs.
