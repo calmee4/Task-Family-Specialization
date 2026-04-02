@@ -1,118 +1,77 @@
-\section{Setup}
+\section{Methodology}
 
 \subsection{Official Metric Contract}
 
-\gittaskbench emits official \processmetric and \resultmetric fields for every
-graded task result. In the evaluator, missing outputs or test-script failures
-are recorded as \processmetric$=$False and \resultmetric$=$False. When a task
-reaches the grading stage, the task script writes final \processmetric /
-\resultmetric records plus comments, and the result analyzer aggregates those
-rows. We keep that contract fixed throughout the paper.
+As introduced in Section~1, \gittaskbench emits official \processmetric and
+\resultmetric fields for every graded trace. Missing outputs or test-script
+failures yield \processmetric$=$False, \resultmetric$=$False. When a trace
+reaches grading, the task script writes final \processmetric/\resultmetric
+records plus evaluator comments.
 
-Representative task scripts show why the split is meaningful.
-\texttt{Trafilatura\_01} uses $F1 \ge 0.90$.
-\texttt{Trafilatura\_02} uses edit-distance ratio $\le 0.50$.
+The split is meaningful because different task scripts impose qualitatively
+different criteria. \texttt{Trafilatura\_01} requires $F1 \ge 0.90$.
+\texttt{Trafilatura\_02} requires edit-distance ratio $\le 0.50$.
 \texttt{SpeechBrain\_05} requires exact JSON \texttt{prediction} match.
-\texttt{PDFPlumber\_02} uses a $75\%$ cell-level threshold.
-Together, these examples separate reaching grading from meeting the full task
-criterion.
+\texttt{PDFPlumber\_02} requires $75\%$ cell-level accuracy. These thresholds
+separate reaching grading from meeting the full task criterion, and they vary
+enough across families that a single global pass rate blends qualitatively
+different evaluation standards.
 
-Our paper-side aggregates therefore obey two rules. First, the benchmark-facing
-numbers are always the official \processmetric and \resultmetric outputs.
-Second, any rates, domain summaries, or heatmaps reported in the paper are
-derived only by aggregating those official outputs.
+We interpret \processmetric conservatively throughout the paper.
+\processmetric$=$True means that the trace received an official benchmark
+record, not that it is a clean semantic near-miss: some official comments
+report threshold misses, while others report parsing or evaluation errors after
+grading begins. All paper-side aggregates are derived only from these official
+outputs; no hand relabeling is involved.
 
-We also interpret \processmetric conservatively. In this paper,
-\processmetric$=$True means that the trace advanced far enough to receive an
-official benchmark record. It does not mean that every such row is a clean
-semantic near-miss: some official comments report threshold misses, while others
-report parsing or evaluation errors after grading begins.
+\subsection{Evaluation Cohorts}
 
-\subsection{Cohorts}
+We organize the evidence into four cohorts with an intentional hierarchy:
 
-The main cohort is a comparable open-model sweep over the full official
-\gittaskbench task set. Comparable here means that every model in this cohort
-is evaluated on the same benchmark task roster, through the same agent harness
-family, and against the same official evaluator contract. The paper-side totals
-are then computed from the emitted official rows rather than from hand
-relabeling.
+\paragraph{Comparable open-model cohort (primary evidence).}
+Eight models evaluated on the full official \gittaskbench task set through the
+same agent harness and evaluator contract:
+\texttt{Qwen2.5-7B},
+\texttt{Qwen2.5-14B},
+\texttt{Qwen2.5-32B},
+\texttt{Qwen3-14B},
+\texttt{Qwen3-32B},
+\texttt{DeepSeek-R1-D8B},
+\texttt{Mistral-7B}, and
+\texttt{Mistral-Small-24B}.
 
-The open-model roster is:
-\begin{itemize}[leftmargin=1.25em]
-\item \texttt{Qwen2.5-7B},
-\item \texttt{Qwen2.5-14B},
-\item \texttt{Qwen2.5-32B},
-\item \texttt{Qwen3-14B},
-\item \texttt{Qwen3-32B},
-\item \texttt{DeepSeek-R1-D8B},
-\item \texttt{Mistral-7B},
-\item \texttt{Mistral-Small-24B}.
-\end{itemize}
+\paragraph{Shared Trafilatura slice (cross-model existence proof).}
+Task-aligned runs on \texttt{Trafilatura\_01} and \texttt{Trafilatura\_02} that
+extend coverage to \texttt{gpt-5.2} and \texttt{Gemini-2.5-Pro}. This slice
+checks whether official success patterns extend beyond the open-model family
+but is not comparable in the same sense as the main cohort.
 
-To reduce Qwen-centric interpretation, we add a second cohort built from the
-shared tasks \texttt{Trafilatura\_01} and \texttt{Trafilatura\_02}. This slice
-expands the roster by adding \texttt{gpt-5.2} and
-\texttt{Gemini-2.5-Pro}. The shared-task cohort is smaller, but it lets us
-check whether some official success patterns already extend beyond the main
-open-model sweep.
+\paragraph{Targeted provider screen (robustness check).}
+\texttt{gpt-5-chat}, \texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro} on a
+structured task subset covering the main success-bearing families, the main
+\processmetric$=$True/\resultmetric$=$False families, and one image plus one
+video stressor. Reported separately from the comparable cohort.
 
-For the comparable cohort, each model is evaluated on the full benchmark task
-roster. For the shared \texttt{Trafilatura} slice, each model contributes one
-aligned run on the same benchmark tasks. This gives broader model coverage, but
-it is not comparable in the same sense as the main cohort: it aligns exact
-benchmark tasks and the same official evaluator fields, but it is used only as
-task-aligned cross-model evidence rather than as a synchronized frontier rerun.
+\paragraph{Full-benchmark provider sweeps (extrapolation test).}
+The same three provider models on the full benchmark, testing whether targeted
+screen activations persist once the full task distribution is restored. Also
+reported separately.
 
-As a separate robustness check, we also complete one targeted provider
-screen for three provider models:
-\texttt{gpt-5-chat}, \texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro}. The task
-set is intentionally small but structured. The selection rule is fixed rather
-than ad hoc: it includes the main success-bearing families from the comparable
-cohort, the main \processmetric$=$True/\resultmetric$=$False families,
-and one image plus one video stressor. We report the screen separately rather
-rather than merging it into the comparable totals because it is a targeted slice
-rather than a full-benchmark cohort.
+\subsection{Aggregation and Reporting}
 
-To test whether that targeted slice extrapolates, we also run
-\texttt{gpt-5-chat}, \texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro} over the
-full benchmark under the same evaluation protocol. We likewise report these
-runs separately from the comparable cohort and from the targeted provider
-screen.
+Each model-task trace is reduced to its official
+\processmetric/\resultmetric pair. Family labels come from the task prefix
+(e.g., \texttt{Eparse\_02} $\to$ \texttt{Eparse}). Domain labels are fixed at
+the family level: \texttt{Eparse}, \texttt{PDFPlumber}, and \texttt{PyPDF2}
+are office-document tasks; \texttt{Faker}, \texttt{InvisibleWatermark}, and
+\texttt{Stegano} are security tasks; \texttt{Trafilatura} and \texttt{Scrapy}
+are web tasks; and so on. The taxonomy is fixed before results, not learned
+from them.
 
-These cohort choices set the paper's scope. The paper studies benchmark-visible
-structure under a fixed evaluation protocol; it is not intended as a
-synchronized scrape of the public \gittaskbench leaderboard or as a same-day
-frontier bakeoff.
-
-\subsection{Aggregation Protocol}
-
-Our paper-side aggregation is intentionally simple. Each model-task trace is
-first reduced to the benchmark's official \processmetric/\resultmetric pair.
-Family labels come directly from the task prefix, e.g., \texttt{Eparse\_02} to
-\texttt{Eparse}. Domain labels are then fixed at the family level:
-\texttt{Eparse}, \texttt{PDFPlumber}, and \texttt{PyPDF2} are office-document
-tasks; \texttt{Faker}, \texttt{InvisibleWatermark}, and \texttt{Stegano} are
-security tasks; \texttt{Trafilatura} and \texttt{Scrapy} are web tasks; and so
-on. We do not learn a taxonomy from results.
-
-This matters because the benchmark is structurally imbalanced even before model
-performance enters the picture. Image tasks occupy the largest share of
-evaluation mass, while video is only a small residue. A global pass rate over
-this mixture is therefore a blend over very different task families and very
-different amounts of evaluation mass.
-
-The same logic explains why we keep the targeted provider screen separate.
-That screen is deliberately curated toward the families that matter most for the
-current paper: the main success-bearing families, the main
-graded-but-unsuccessful families, and one image/video stress check. It is
-therefore useful as a robustness probe, but it is not a replacement for the
-comparable cohort.
-Mixing the two into one aggregate would create a reporting problem of its own:
-the same paper would conflate a benchmark-wide cohort with a targeted slice.
-That distinction matters even more once the provider screen is multi-model. The
-screen is useful for checking whether some cohort zeros disappear under a
-different model class, but it should not be mistaken for a replacement
-leaderboard.
+This mapping matters because the benchmark is structurally imbalanced. Image
+tasks occupy the largest share of evaluation mass, while video is only a small
+residue. A global pass rate over this mixture blends very different task
+families and very different amounts of evaluation mass.
 
 We use three reporting views throughout the paper:
 \begin{enumerate}[leftmargin=1.25em]
@@ -122,23 +81,7 @@ We use three reporting views throughout the paper:
 \processmetric$=$True, \resultmetric$=$False regime.
 \end{enumerate}
 
-This protocol stays within the benchmark's official metric contract while still
-recovering more structure than a single global pass rate.
-
-Finally, the protocol is intentionally asymmetric with respect to claims. Global
-totals can support only global claims. Family slices can support only family
-claims. Representative comments from official outputs can support only scoped
-interpretations about the graded-but-unsuccessful regime. We use this asymmetry
-throughout the paper to keep the analysis conservative.
-
-We also report exact cohort totals rather than seed-averaged estimates. The
-current evidence therefore supports descriptive benchmark claims, not variance
-estimates or statistical-significance claims.
-
-\subsection{Analysis Pipeline}
-
-All tables and figures are regenerated from exported summaries of the official
-\processmetric/\resultmetric outputs. The analysis therefore does not rely on
-manual relabeling or manual transcription. Every paper-side rate, domain slice,
-or heatmap is a deterministic aggregation of the benchmark's own official
-outputs.
+The four cohorts are never merged into one aggregate. The comparable cohort
+supports the paper's main claims; the provider cohorts are robustness checks
+reported in their own sections. All tables and figures are regenerated
+deterministically from exported summaries of the official outputs.
