@@ -3,8 +3,8 @@
 Agent evaluation is quickly moving beyond single-turn QA into web navigation,
 mobile environments, software engineering, and repository-grounded tool use
 \cite{agentbench,webarena,visualwebarena,androidworld,swebench,swelancer,ambigswe,longsoftwaretasks,gittaskbench,toolgym,deepresearchbench,mcpbench,mcpuniverse}.
-This shift is healthy: real agent deployments are rarely pure language tasks.
-They require interacting with interfaces, repositories, and heterogeneous tools
+Real deployments are rarely pure language tasks. They require interacting with
+interfaces, repositories, and heterogeneous tools
 while producing structured outputs that can be checked automatically.
 
 At the same time, the dominant reporting habit has remained simple. A model is
@@ -30,26 +30,26 @@ task criterion. Some traces never reach grading; others reach grading but still
 fail. If both cases are collapsed into a single final success rate, important
 structure disappears.
 
-The empirical design stays deliberately simple. The main cohort is a comparable
-open-model sweep on \gittaskbench. We then add a smaller
-\texttt{Trafilatura\_01/02} slice on web-extraction tasks that extends coverage
-to provider models, including \texttt{gpt-5.2} and \texttt{Gemini-2.5-Pro}. We
-also add a targeted provider screen on
-\texttt{gpt-5-chat}, \texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro} so the paper
-does not reduce to a purely within-open-model comparison. For the shared-task
-slice, we align identical benchmark tasks across models without treating that
-slice as a same-day frontier ranking. All plots and tables aggregate only the
-benchmark's official \processmetric and \resultmetric outputs. Derived rates
-and heatmaps are marked as paper-side summaries rather than as new benchmark
-metrics. Finally, we add full-benchmark provider sweeps for
+The empirical design stays deliberately simple. The primary evidence is a
+comparable open-model cohort on \gittaskbench. We then add a smaller
+\texttt{Trafilatura\_01/02} subset on web-extraction tasks that extends
+coverage to provider models, including \texttt{gpt-5.2} and
+\texttt{Gemini-2.5-Pro}. We also add a targeted provider cohort on
+\texttt{gpt-5-chat}, \texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro} so the
+paper does not reduce to a purely within-open-model comparison. For the
+task-aligned \texttt{Trafilatura} subset, we align identical benchmark tasks
+across models without treating that subset as a frontier ranking. All plots and
+tables report official \processmetric and \resultmetric totals or deterministic
+aggregates derived from them. Finally, we add full-benchmark provider sweeps for
 \texttt{gpt-5-chat}, \texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro} to test
-whether the targeted screen remains representative once the full benchmark
+whether the targeted subset remains representative once the full benchmark
 distribution is restored.
 
-The evidence hierarchy is intentional. The comparable cohort is the
-paper's primary evidence. The targeted provider screen and the full-benchmark
-provider sweeps are separate robustness checks, and the shared
-\texttt{Trafilatura} slice is used only as a cross-model existence proof.
+The evidence hierarchy is intentional. The comparable cohort is the paper's
+primary evidence. The \texttt{Trafilatura} subset, the targeted provider
+cohort, the supplementary full-benchmark provider cohorts, and the short
+open-model breadth extension are secondary analyses used to test whether the
+same family structure survives broader model coverage.
 
 Three findings motivate the paper. First, official success is narrow and
 domain-skewed. In the comparable cohort, all observed \resultmetric mass
@@ -57,7 +57,7 @@ lies in office, security, web, and speech families; image and video families
 are complete zeros. Second, tied headline totals hide family specialization.
 The three headline leaders in the comparable cohort tie on official
 \resultmetric success, but they succeed
-on different tasks and families. The targeted provider screen adds a second
+on different tasks and families. The targeted provider cohort adds a second
 measurement point: broader frontier coverage changes which families activate,
 but provider models are themselves highly non-uniform on the same official
 tasks. The full-benchmark provider sweeps sharpen that point further:
@@ -80,9 +80,10 @@ benchmark's own outputs.
 \paragraph{Contributions.}
 This paper makes four concrete contributions.
 \begin{enumerate}[leftmargin=1.25em]
-\item We construct an official-metric audit of \gittaskbench over a
-comparable open-model cohort and a broader shared-task slice, while keeping the
-benchmark's official \processmetric/\resultmetric contract fixed.
+\item We construct an official-metric study of \gittaskbench over a
+comparable open-model cohort together with task-aligned and provider-side
+supplementary cohorts, while keeping the benchmark's official
+\processmetric/\resultmetric contract fixed.
 \item We show that official \resultmetric success is highly concentrated in a
 small subset of domains and families rather than being smoothly distributed
 across the benchmark.
@@ -97,6 +98,6 @@ explicitly in future repo-grounded evaluations.
 This paper is a descriptive benchmark study, not a synchronized public
 leaderboard scrape. We report exact observed \processmetric/\resultmetric
 counts from the evaluated cohorts, and we use the provider slices as separate
-robustness checks rather than as claims about a stable frontier ranking. The
+supplementary analyses rather than as claims about a stable frontier ranking. The
 resulting claims are descriptive and benchmark-facing, not inferential
 estimates over repeated random seeds.

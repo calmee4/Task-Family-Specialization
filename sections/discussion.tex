@@ -27,8 +27,8 @@ provides a compact benchmark headline. Second, the same table or a companion
 figure should report family or domain slices, so the reader can see where the
 success mass actually lands. Third, the paper should expose at least a small
 sample of official \processmetric$=$True, \resultmetric$=$False comments from
-the families that dominate that regime. Fourth, any separate targeted slice,
-such as our provider screen, should be labeled explicitly as a robustness check
+the families that dominate that regime. Fourth, any separate targeted subset,
+such as our provider cohort, should be labeled explicitly as a supplementary analysis
 rather than silently merged into the main benchmark cohort.
 
 This standard is intentionally lightweight. It does not require trajectory
@@ -62,10 +62,10 @@ dependencies, artifact formats, and evaluator thresholds.
 
 \subsection{Providers Are Not One Control Condition}
 
-The targeted provider screen adds one more practical lesson. Papers often
+The targeted provider cohort adds one more practical lesson. Papers often
 use one strong provider model as a qualitative control and then discuss ``closed
 models'' as if they formed one stable reference class. Our evidence does not
-support that shortcut. On the same targeted GitTaskBench slice, \texttt{gpt-5-chat},
+support that shortcut. On the same targeted GitTaskBench subset, \texttt{gpt-5-chat},
 \texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro} occupy very different parts of the
 \processmetric/\resultmetric space. This does not prove a frontier ranking, but
 it does show that provider breadth matters even for a conservative benchmark
@@ -78,14 +78,14 @@ family, the next question should not be ``can one cherry-picked provider model
 solve it?'' The more useful question is whether the family activates
 consistently across a broader model class. In the present study,
 \texttt{NeuroKit} and \texttt{Scrapy} move under both GPT-family models, while
-the targeted image and video stressors in that screen stay dark. This is
+the targeted image and video stressors in that subset stay dark. This is
 exactly why we recommend reporting family slices rather than only one total or
 one anecdotal frontier run.
 
-\subsection{Targeted Screens Need Full-Benchmark Backstops}
+\subsection{Targeted Subsets Need Full-Benchmark Backstops}
 
 The separate full-benchmark provider sweeps add a second lesson. A
-targeted screen is good at finding activation points, but it can be optimistic
+targeted subset is good at finding activation points, but it can be optimistic
 about how stable those activations are once the full benchmark distribution is
 restored. The three full sweeps do not collapse into one provider story.
 \texttt{gpt-5.2} shows materially broader full-benchmark coverage in the
@@ -97,11 +97,11 @@ redistribute success across families: \texttt{gpt-5-chat} keeps
 \texttt{Trafilatura} as an active web family, whereas \texttt{gpt-5.2} shifts
 more of its observed success footprint toward speech and image families.
 
-This matters for future method papers. If authors use a short targeted slice to
+This matters for future method papers. If authors use a short targeted subset to
 motivate a broad capability claim, they may accidentally report family
 activation as if it were family robustness, or they may miss where a model's
 full-benchmark success budget actually lands. Our recommendation is therefore
-two-stage. Targeted screens are useful for triage, sanity checks, and
+two-stage. Targeted subsets are useful for triage, sanity checks, and
 expanding model coverage quickly. But any family-level positive result that
 becomes part of the paper's main narrative should be backstopped by at least
 one full-benchmark or full-family check under the same official metric
@@ -141,7 +141,7 @@ still failing the task criterion.
 A second working hypothesis is that family specialization reflects different
 mixtures of prior tool familiarity, data exposure, and output-format control
 rather than one scalar notion of ``agent strength.'' The leading Qwen models do
-not spend their success budget on the same families, and the provider screen
+not spend their success budget on the same families, and the targeted provider cohort
 changes which web and physiological-signal families activate without rescuing
 the image/video stressors. A plausible interpretation is that structured
 extraction, light web processing, and speech JSON tasks reward different priors,
@@ -155,12 +155,17 @@ of trajectory-level analysis.
 The paper has clear limits. First, the main evidence is a fixed study cohort
 rather than a synchronized scrape of the public \gittaskbench leaderboard.
 Second, broader provider coverage currently exists only on the small shared
-\texttt{Trafilatura} slice, which is aligned by task but not intended as a
-synchronized same-day rerun. Third, some \processmetric$=$False mass may still
-reflect harness-specific brittleness rather than pure model weakness. Some
+\texttt{Trafilatura} subset, which is aligned by task but not intended as a
+matched frontier rerun. Third, the supplementary open-model breadth cohort is
+also task-limited; we use it only to test whether the family concentration
+extends to a broader roster on the same targeted subset. Fourth, some
+\processmetric$=$False mass may still reflect evaluation-pipeline brittleness
+rather than pure model weakness. Some
 \processmetric$=$True, \resultmetric$=$False rows also include evaluation-side
-errors rather than pure threshold misses. For these reasons, we present the
-paper as a descriptive benchmark analysis, not as a universal scaling law.
+errors rather than pure threshold misses. Finally, each reported cohort total is
+a single-run count rather than a variance estimate, so small model gaps should
+be read descriptively. For these reasons, we present the paper as a descriptive
+benchmark analysis, not as a universal scaling law.
 
 \subsection{How This Connects to Richer Agent Analysis}
 

@@ -46,7 +46,7 @@ extraction, or simply facing a benchmark where most active success mass lives in
 just a few families.
 
 The same conclusion survives normalization by domain mass. Figure~\ref{fig:domain-rates}
-shows paper-side \processmetric and \resultmetric rates after aggregating the
+shows domain-level \processmetric and \resultmetric rates after aggregating the
 official outputs by fixed benchmark domain. Office and security still dominate
 after that normalization; web and speech retain a smaller but non-zero
 conversion band; physiological-signal tasks reach grading without converting to
@@ -58,7 +58,7 @@ accounting for how much evaluation mass each domain contributes.
 \begin{figure}[t]
     \centering
     \includegraphics[width=\columnwidth]{figures/figure_domain_summary.pdf}
-    \caption{Paper-side domain rates aggregated from GitTaskBench official metrics. Office and security remain the main success-bearing domains after normalization by domain mass, while image and video stay at zero.}
+    \caption{Domain-level rates aggregated from GitTaskBench official metrics. Office and security remain the main success-bearing domains after normalization by domain mass, while image and video stay at zero.}
     \label{fig:domain-rates}
 \end{figure}
 
@@ -103,7 +103,7 @@ The comparable cohort contains only one non-Qwen model with non-zero
 official \resultmetric success: \texttt{Mistral-Small-24B}. Its wins are \texttt{Eparse\_02} and
 \texttt{Trafilatura\_03}. That is enough to prevent the main observation from
 reducing to a purely within-Qwen comparison, although same-task non-Qwen
-coverage remains limited. The shared-task \texttt{Trafilatura} slice extends
+coverage remains limited. The task-aligned \texttt{Trafilatura} subset extends
 the point further. Table~\ref{tab:shared-trafilatura} shows that
 \texttt{gpt-5.2} and \texttt{Gemini-2.5-Pro} both achieve official
 \processmetric$=$1, \resultmetric$=$1 on \texttt{Trafilatura\_02}. The main
@@ -114,15 +114,26 @@ tasks are aligned.
 
 \input{tables/shared_trafilatura}
 
-The shared-task slice is aligned by task but is not intended as a calibrated
+The task-aligned subset is aligned by task but is not intended as a calibrated
 cross-model ranking. The supported claim is narrower: once the same official
 tasks are aligned, official non-Qwen successes already appear.
 
-\subsection{A Supplementary Provider Screen Changes The Active Families}
+An additional open-model breadth cohort broadens that
+point further without changing the main pattern. Under the same official metric
+contract, \texttt{DeepSeek-R1-Distill-Qwen-32B} records six official
+\resultmetric-positive rows concentrated in \texttt{Faker},
+\texttt{PDFPlumber}, and \texttt{Trafilatura}, while
+\texttt{Phi-3.5-mini-instruct} remains at zero on the subset. The same cohort
+also leaves the image/video stressors dark across the roster. In other words,
+adding more open-model breadth does not smooth the slice into one uniform
+ordering; it reproduces the same family concentration that the main cohort and
+provider cohorts already expose.
 
-The shared \texttt{Trafilatura} slice broadens coverage across models but only on
+\subsection{A Targeted Provider Cohort Changes The Active Families}
+
+The shared \texttt{Trafilatura} subset broadens coverage across models but only on
 a narrow slice. To test whether the family picture changes on a slightly wider
-slice, we complete the same targeted provider screen for three provider models:
+subset, we complete the same targeted provider cohort for three provider models:
 \texttt{gpt-5-chat}, \texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro}. The task set
 includes office, security, speech, web, physiological-signal, image, and video
 tasks, and it is scored only with official \processmetric/\resultmetric
@@ -131,10 +142,10 @@ outputs.
 \input{tables/provider_screen}
 
 The resulting spread is already substantial. \texttt{gpt-5-chat} leads the
-screen on both official fields and spans the broadest family footprint.
+subset on both official fields and spans the broadest family footprint.
 \texttt{gpt-5.2} follows with a slightly narrower family footprint.
 \texttt{Gemini-2.5-Pro} reaches official success only on
-\texttt{PDFPlumber\_01}. The provider screen therefore broadens the evidence
+\texttt{PDFPlumber\_01}. The targeted provider cohort therefore broadens the evidence
 base, but it does not behave like a single homogeneous ``closed-model'' control
 condition or a hidden replacement leaderboard.
 
@@ -149,12 +160,12 @@ structure that a single global pass rate would obscure. If we reported only one
 provider total, we would hide the fact that ``provider strength'' is itself
 family-selective in the present study.
 
-The provider screen also changes how we should read the cohort zeros. A zero in
+The targeted provider cohort also changes how we should read the cohort zeros. A zero in
 the comparable cohort need not mean the family is inherently impossible under the
 benchmark's official metric. \texttt{NeuroKit} and \texttt{Scrapy} illustrate
 this clearly. In the comparable cohort they contribute only to the
 \processmetric$=$True, \resultmetric$=$False regime or to complete failure. In
-the provider screen they become official \resultmetric-positive families for
+the targeted provider cohort they become official \resultmetric-positive families for
 both GPT-family models. By contrast, the image and video stressors,
 \texttt{AnimeGANv3\_01} and \texttt{VideoPose3D\_01}, remain
 \processmetric$=$False for all three provider models. That difference is
@@ -162,7 +173,7 @@ important: some zeros are family-specific capability gaps that move with model
 class, while others look more like benchmark-wide dead zones under the current
 agent setup.
 
-The screen also shows that stronger totals do not eliminate the intermediate
+The subset also shows that stronger totals do not eliminate the intermediate
 \processmetric$=$True, \resultmetric$=$False regime. Both \texttt{gpt-5-chat}
 and \texttt{gpt-5.2} still spend mass there on \texttt{PDFPlumber\_02} and
 \texttt{Trafilatura\_01}. \texttt{gpt-5.2} additionally lands in that regime on
@@ -171,10 +182,10 @@ models are not simply converting every non-success into clean official success;
 they are redistributing failures across the benchmark's existing official
 states.
 
-\subsection{Full-Benchmark Provider Sweeps Show The Screen Is Not Enough}
+\subsection{Full-Benchmark Provider Sweeps Show The Subset Is Not Enough}
 
-The targeted provider screen is useful for broadening model coverage, but it is
-still a targeted slice. To test how far that slice extrapolates, we complete
+The targeted provider cohort is useful for broadening model coverage, but it is
+still a targeted subset. To test how far that subset extrapolates, we complete
 full-benchmark sweeps for \texttt{gpt-5-chat}, \texttt{gpt-5.2}, and
 \texttt{Gemini-2.5-Pro}. Table~\ref{tab:provider-full54-summary} summarizes the
 resulting official totals and the families that actually reach official
@@ -182,7 +193,7 @@ resulting official totals and the families that actually reach official
 
 \input{tables/provider_full54_summary}
 
-The full sweeps show why the short screen is not enough. In this study,
+The full sweeps show why the short subset is not enough. In this study,
 \texttt{gpt-5.2} records higher official \processmetric and \resultmetric
 totals than \texttt{gpt-5-chat}, and it activates a much broader family
 footprint, including \texttt{FunASR}, \texttt{InvisibleWatermark},
@@ -197,21 +208,21 @@ security, web, and one image family, with official-success families limited to
 office/security footprint centered on \texttt{Faker} and \texttt{PyPDF2}.
 
 The family-level changes are informative in both directions. The targeted
-screen overstates some activations: \texttt{gpt-5-chat} reaches official
+subset overstates some activations: \texttt{gpt-5-chat} reaches official
 \resultmetric success on \texttt{SpeechBrain\_05} and \texttt{NeuroKit\_01} in
-the screen, yet speech stays dark and \texttt{NeuroKit} falls back into the
+the subset, yet speech stays dark and \texttt{NeuroKit} falls back into the
 graded-but-unsuccessful regime once the full family distribution is restored.
-The screen also misses some activations: \texttt{gpt-5.2} picks up full-benchmark
+The subset also misses some activations: \texttt{gpt-5.2} picks up full-benchmark
 official success in \texttt{FunASR}, \texttt{Stegano},
 \texttt{StyleTransfer}, and \texttt{TransparentBackground}, while
 \texttt{Gemini-2.5-Pro}'s only full-benchmark official-success families are
-\texttt{Faker} and \texttt{PyPDF2} rather than the screen's single
+\texttt{Faker} and \texttt{PyPDF2} rather than the subset's single
 \texttt{PDFPlumber} success. That family shift is small in absolute terms, but
 it reinforces the paper's narrower point that provider coverage does not behave
 like one homogeneous control condition.
 
-This is the clearest reason not to treat a targeted provider slice as a hidden
-replacement leaderboard. A short screen can reveal that a family is reachable
+This is the clearest reason not to treat a targeted provider subset as a hidden
+replacement leaderboard. A short subset can reveal that a family is reachable
 at all, but only full-benchmark sweeps show whether those activations persist,
 swap across families, or disappear once the full task distribution is restored.
 

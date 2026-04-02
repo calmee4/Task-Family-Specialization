@@ -17,10 +17,14 @@ Representative task scripts show why the split is meaningful.
 Together, these examples separate reaching grading from meeting the full task
 criterion.
 
-Our paper-side aggregates therefore obey two rules. First, the benchmark-facing
+Our reported aggregates therefore obey two rules. First, the benchmark-facing
 numbers are always the official \processmetric and \resultmetric outputs.
 Second, any rates, domain summaries, or heatmaps reported in the paper are
 derived only by aggregating those official outputs.
+All reported cohorts use the same benchmark prompt/context bundle and the same
+single-agent code-generation loop. Each task allows at most two
+generation/repair attempts, each attempt is capped at 2600 completion tokens,
+and generated solve scripts run under a 240\,s timeout before official grading.
 
 We also interpret \processmetric conservatively. In this paper,
 \processmetric$=$True means that the trace advanced far enough to receive an
@@ -32,9 +36,9 @@ report parsing or evaluation errors after grading begins.
 
 The main cohort is a comparable open-model sweep over the full official
 \gittaskbench task set. Comparable here means that every model in this cohort
-is evaluated on the same benchmark task roster, through the same agent harness
-family, and against the same official evaluator contract. The paper-side totals
-are then computed from the emitted official rows rather than from hand
+is evaluated on the same benchmark task roster, under the same evaluation
+pipeline family, and against the same official evaluator contract. The reported
+totals are then computed from the emitted official rows rather than from hand
 relabeling.
 
 The open-model roster is:
@@ -50,9 +54,9 @@ The open-model roster is:
 \end{itemize}
 
 To reduce Qwen-centric interpretation, we add a second cohort built from the
-shared tasks \texttt{Trafilatura\_01} and \texttt{Trafilatura\_02}. This slice
+shared tasks \texttt{Trafilatura\_01} and \texttt{Trafilatura\_02}. This subset
 expands the roster by adding \texttt{gpt-5.2} and
-\texttt{Gemini-2.5-Pro}. The shared-task cohort is smaller, but it lets us
+\texttt{Gemini-2.5-Pro}. The task-aligned cohort is smaller, but it lets us
 check whether some official success patterns already extend beyond the main
 open-model sweep.
 
@@ -61,32 +65,34 @@ roster. For the shared \texttt{Trafilatura} slice, each model contributes one
 aligned run on the same benchmark tasks. This gives broader model coverage, but
 it is not comparable in the same sense as the main cohort: it aligns exact
 benchmark tasks and the same official evaluator fields, but it is used only as
-task-aligned cross-model evidence rather than as a synchronized frontier rerun.
+task-aligned cross-model evidence rather than as a frontier ranking.
 
-As a separate robustness check, we also complete one targeted provider
-screen for three provider models:
+We also evaluate a targeted provider cohort for three provider models:
 \texttt{gpt-5-chat}, \texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro}. The task
 set is intentionally small but structured. The selection rule is fixed rather
 than ad hoc: it includes the main success-bearing families from the comparable
 cohort, the main \processmetric$=$True/\resultmetric$=$False families,
-and one image plus one video stressor. We report the screen separately rather
-rather than merging it into the comparable totals because it is a targeted slice
+and one image plus one video stressor. We report the subset separately rather
+than merging it into the comparable totals because it is a targeted subset
 rather than a full-benchmark cohort.
 
-To test whether that targeted slice extrapolates, we also run
+We further evaluate a supplementary open-model breadth cohort on the
+same subset. Its role is narrower than that of the comparable cohort: it tests
+whether the same family concentration persists once the open-model roster is
+broadened, while remaining explicitly task-limited.
+
+To test whether that targeted subset extrapolates, we also run
 \texttt{gpt-5-chat}, \texttt{gpt-5.2}, and \texttt{Gemini-2.5-Pro} over the
 full benchmark under the same evaluation protocol. We likewise report these
 runs separately from the comparable cohort and from the targeted provider
-screen.
+cohort.
 
-These cohort choices set the paper's scope. The paper studies benchmark-visible
-structure under a fixed evaluation protocol; it is not intended as a
-synchronized scrape of the public \gittaskbench leaderboard or as a same-day
-frontier bakeoff.
+The paper studies benchmark-visible structure under a fixed evaluation protocol
+rather than a synchronized scrape of the public \gittaskbench leaderboard.
 
 \subsection{Aggregation Protocol}
 
-Our paper-side aggregation is intentionally simple. Each model-task trace is
+Our aggregation protocol is intentionally simple. Each model-task trace is
 first reduced to the benchmark's official \processmetric/\resultmetric pair.
 Family labels come directly from the task prefix, e.g., \texttt{Eparse\_02} to
 \texttt{Eparse}. Domain labels are then fixed at the family level:
@@ -101,16 +107,16 @@ evaluation mass, while video is only a small residue. A global pass rate over
 this mixture is therefore a blend over very different task families and very
 different amounts of evaluation mass.
 
-The same logic explains why we keep the targeted provider screen separate.
-That screen is deliberately curated toward the families that matter most for the
+The same logic explains why we keep the targeted provider cohort separate.
+That subset is deliberately curated toward the families that matter most for the
 current paper: the main success-bearing families, the main
 graded-but-unsuccessful families, and one image/video stress check. It is
-therefore useful as a robustness probe, but it is not a replacement for the
+therefore useful as a supplementary probe, but it is not a replacement for the
 comparable cohort.
 Mixing the two into one aggregate would create a reporting problem of its own:
 the same paper would conflate a benchmark-wide cohort with a targeted slice.
-That distinction matters even more once the provider screen is multi-model. The
-screen is useful for checking whether some cohort zeros disappear under a
+That distinction matters even more once the targeted subset is multi-model. The
+subset is useful for checking whether some cohort zeros disappear under a
 different model class, but it should not be mistaken for a replacement
 leaderboard.
 
@@ -139,6 +145,6 @@ estimates or statistical-significance claims.
 
 All tables and figures are regenerated from exported summaries of the official
 \processmetric/\resultmetric outputs. The analysis therefore does not rely on
-manual relabeling or manual transcription. Every paper-side rate, domain slice,
+manual relabeling or manual transcription. Every reported rate, domain slice,
 or heatmap is a deterministic aggregation of the benchmark's own official
 outputs.
